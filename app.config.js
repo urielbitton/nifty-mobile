@@ -2,11 +2,11 @@ module.exports = {
   name: 'Nifty App',
   version: '1.0.0',
   extra: {
-    firebaseAPiKey: 'AIzaSyAuZsQCoySmkGQA_6a5TvuXoc5lU_e0TpY',
-    authDomain: 'rentage-app.firebaseapp.com',
-    projectId: 'rentage-app',
-    storageBucket: 'rentage-app.appspot.com',
-    messagingSenderId: '110160602349',
-    appId: '1:110160602349:web:eea11c1d6f64f6fae798e4',
+    firebaseAPiKey: 'AIzaSyAMTIxiQKGO1fqT_cjHEGxuTu9oI2jFKcU',
+    authDomain: 'nifty-app-ada6c.firebaseapp.com',
+    projectId: 'nifty-app-ada6c',
+    storageBucket: 'nifty-app-ada6c.appspot.com',
+    messagingSenderId: '215574711968',
+    appId: '1:215574711968:web:1108073db3c81cd88a43c5',
   },
 };
