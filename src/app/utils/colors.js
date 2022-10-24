@@ -1,4 +1,4 @@
 export const colors = {
-  primary: '#ff424d',
+  primary: '#720FFF',
   grayText: '#B5BBCA'
 }

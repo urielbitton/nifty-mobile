@@ -13,10 +13,25 @@ export default function HomeContainer() {
   const tabsBarRender = bottomBarLinks.map((tab, i) => {
     return <Tab.Screen 
       options={{
-        tabBarIcon: ({focused}) => <FontAwesome style={{top: -3}} name={tab.icon} size={25} color={focused ? colors.primary : colors.grayText} />,
-        tabBarStyle: {paddingVertical: 10, height: 60, justifyContent: 'center', alignItems: 'center'},
-        tabBarLabelStyle: {top: -8, fontSize: 12},
-        tabBarActiveTintColor: colors.primary
+        tabBarIcon: ({focused}) => 
+          <FontAwesome 
+            style={{top: -3}} 
+            name={tab.icon} 
+            size={25} 
+            color={focused ? colors.primary : colors.grayText} 
+          />,
+        tabBarStyle: {
+          paddingVertical: 10, 
+          height: 60, 
+          justifyContent: 'center', 
+          alignItems: 'center'
+        },
+        tabBarLabelStyle: {
+          top: -8, 
+          fontSize: 12
+        },
+        tabBarActiveTintColor: colors.primary,
+        tabBarShowLabel: false,
       }} 
       name={tab.name}
       component={tab.Component} 

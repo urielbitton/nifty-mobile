@@ -10,7 +10,6 @@ export default function AppContainer() {
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
-      <Navbar />
       <HomeContainer />
     </View>
   )

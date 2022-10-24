@@ -19,7 +19,6 @@ export default function Screen(props) {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#fafafa',
-    paddingTop: 50
+    backgroundColor: '#fff',
   }
 })
