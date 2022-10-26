@@ -14,7 +14,7 @@ module.exports = {
       "alias": {
         "~": "./src",
       }
-    }]
+    }],
   ],
   presets: ['babel-preset-expo', '@babel/preset-react'],
 }

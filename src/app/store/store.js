@@ -12,6 +12,8 @@ const StoreContextProvider = ({children}) => {
   const [loggingAuth, setLoggingAuth] = useState(true)
   const myUserID = user?.uid
   const myUserName = `${myUser?.firstName} ${myUser?.lastName}`
+  const myInterestedJobIDs = myUser?.interestedJobIDs
+  const myNotInterestedJobIDs = myUser?.notInterestedJobIDs
   const scrollTopRef= useRef()
 
   useEffect(() => {
@@ -28,7 +30,8 @@ const StoreContextProvider = ({children}) => {
 
 
   return <StoreContext.Provider value={{ 
-    user, myUser, setMyUser, myUserID, myUserName,
+    user, myUser, setMyUser, myUserID, myUserName, myInterestedJobIDs,
+    myNotInterestedJobIDs, 
     loggingAuth, setLoggingAuth, 
     scrollTopRef
   }}>

@@ -1,7 +1,6 @@
 import React from 'react'
 import { Tab, TabView } from '@rneui/themed' 
 import { colors } from "app/utils/colors"
-import { Text } from "react-native"
 
 export default function AppTabSlider(props) {
 
@@ -43,6 +42,7 @@ export default function AppTabSlider(props) {
         value={index}
         onChange={setIndex}
         animationType={animationType}
+        disableSwipe
       >
         {pagesRender}
       </TabView>
