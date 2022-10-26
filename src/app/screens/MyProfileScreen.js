@@ -1,11 +1,20 @@
-import React from 'react'
-import { Text, View } from "react-native"
+import Login from "app/auth/Login"
+import { StoreContext } from "app/store/store"
+import React, { useContext, useState } from 'react'
+import { Text } from "react-native"
 import Screen from "../components/layout/Screen"
 
-export default function MyProfileScreen() {
+export default function MyProfileScreen({navigation}) {
+
+  const { user } = useContext(StoreContext)
+
   return (
     <Screen>
-      <Text>My Profile Screen</Text>
+      {
+        user ?
+        <Text onPress={() => navigation.navigate('Home')}>My Profile Screen</Text> :
+        <Login />
+      }
     </Screen>
   )
 }

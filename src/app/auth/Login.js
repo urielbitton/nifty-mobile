@@ -15,6 +15,7 @@ export default function Login() {
     auth.signInWithEmailAndPassword(email, password)
     .then(() => {
       setLoading(false)
+      window.alert('Login successful')
     })
     .catch(err => {
       setLoading(false)
