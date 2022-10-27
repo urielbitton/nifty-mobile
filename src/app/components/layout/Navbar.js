@@ -2,7 +2,9 @@ import React from 'react'
 import { Text, View, StyleSheet, TouchableOpacity } from "react-native"
 import { Image } from "react-native"
 import logoOnly from '../../../../assets/logo-only.png'
-import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { Ionicons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
+import { colors } from "app/utils/colors";
 
 export default function Navbar() {
   return (
@@ -15,18 +17,18 @@ export default function Navbar() {
       </View>
       <View style={styles.right}>
         <TouchableOpacity activeOpacity={0.6}>
-          <MaterialCommunityIcons 
+          <Feather 
             name="bell" 
-            size={24} 
-            color="black" 
+            size={22} 
+            color={colors.primary} 
             style={styles.icon}
           />
         </TouchableOpacity>
         <TouchableOpacity activeOpacity={0.6}>
-          <MaterialCommunityIcons 
-            name="menu" 
-            size={24} 
-            color="black" 
+          <Ionicons 
+            name="ios-menu-outline" 
+            size={26} 
+            color={colors.primary} 
             style={styles.icon}
           />
         </TouchableOpacity>
@@ -42,7 +44,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: colors.appBg,
     padding: 10,
     zIndex: 1000
   },

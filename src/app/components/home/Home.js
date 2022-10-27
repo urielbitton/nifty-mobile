@@ -1,6 +1,5 @@
-import { getRandomDocID, setDB } from "app/services/crudDB"
 import React, { useState } from 'react'
-import { StyleSheet, Text, View, Dimensions, Button } from "react-native"
+import { StyleSheet, View, Dimensions } from "react-native"
 import Navbar from "../layout/Navbar"
 import Screen from "../layout/Screen"
 import AppTabSlider from "../ui/AppTabSlider"
@@ -12,7 +11,6 @@ const screenHeight = Dimensions.get('screen').height - 130
 export default function Home() {
 
   const [index, setIndex] = useState(0)
-  const [createIndex, setCreateIndex] = useState(0)
 
   return (
     <Screen style>

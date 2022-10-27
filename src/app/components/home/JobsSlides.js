@@ -27,6 +27,12 @@ export default function JobsSlides() {
     }
   },[slideIndex])
 
+  useEffect(() => {
+    if(jobs?.length < 2) {
+      setJobsLimit(prev => prev + 1)
+    }
+  },[jobs])
+
   return (
     <View style={styles.container}>
       {/* @ts-ignore */}
@@ -35,7 +41,7 @@ export default function JobsSlides() {
         onScrollIndexChanged={(index) => setSlideIndex(index)}
         loop={jobs?.length > 10}
         enableSnap
-        layoutCardOffset={9}
+        layoutCardOffset={0}
         ref={isCarousel}
         data={uninteractedJobs}
         renderItem={CarouselCard}

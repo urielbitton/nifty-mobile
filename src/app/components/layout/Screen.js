@@ -1,3 +1,4 @@
+import { colors } from "app/utils/colors";
 import React, { useContext } from 'react'
 import {SafeAreaView, StyleSheet, ScrollView} from 'react-native'
 import { StoreContext } from '../../store/store';
@@ -19,6 +20,6 @@ export default function Screen(props) {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.appBg,
   }
 })

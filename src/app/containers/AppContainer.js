@@ -2,8 +2,8 @@ import React from 'react'
 import { View, StyleSheet } from "react-native"
 import { StatusBar } from 'expo-status-bar'
 import HomeContainer from './HomeContainer'
-import Navbar from '../components/layout/Navbar'
 import Constants from 'expo-constants'
+import { colors } from "app/utils/colors"
 
 export default function AppContainer() {
 
@@ -18,7 +18,7 @@ export default function AppContainer() {
 const styles = StyleSheet.create({
   container: {
     flex: 1, 
-    backgroundColor: '#fff',
+    backgroundColor: colors.appBg,
     paddingTop: Constants.statusBarHeight,
   }
 })

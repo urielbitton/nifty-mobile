@@ -1,30 +1,35 @@
 // @ts-nocheck
-import React from 'react'
+import React, { useContext } from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import { FontAwesome } from '@expo/vector-icons'
 import { bottomBarLinks } from "../data/menuLinks"
 import { colors } from "../utils/colors"
+import { StoreContext } from "app/store/store"
  
 const Tab = createBottomTabNavigator()
 
 export default function HomeContainer() {
 
+  const { myUserType } = useContext(StoreContext)
 
-  const tabsBarRender = bottomBarLinks.map((tab, i) => {
+  const tabsBarRender = bottomBarLinks
+  ?.filter(tab => tab.require.includes(myUserType) || tab.require.includes('all'))
+  .map((tab, i) => {
     return <Tab.Screen 
       options={{
         tabBarIcon: ({focused}) => 
-          <FontAwesome 
+          <tab.icon.component 
             style={{top: -3}} 
-            name={tab.icon} 
-            size={25} 
+            name={tab.icon.name} 
+            size={23} 
             color={focused ? colors.primary : colors.grayText} 
           />,
         tabBarStyle: {
           paddingVertical: 10, 
           height: 60, 
           justifyContent: 'center', 
-          alignItems: 'center'
+          alignItems: 'center',
+          borderTopWidth: 0,
+          backgroundColor: colors.appBg,
         },
         tabBarLabelStyle: {
           top: -8, 
