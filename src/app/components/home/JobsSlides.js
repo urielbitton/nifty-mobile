@@ -22,13 +22,13 @@ export default function JobsSlides() {
   ))
 
   useEffect(() => {
-    if(slideIndex === jobs?.length - 1) {
+    if(slideIndex === uninteractedJobs?.length - 1) {
       setJobsLimit(prev => prev + limitIncrement)
     }
   },[slideIndex])
 
   useEffect(() => {
-    if(jobs?.length < 2) {
+    if(uninteractedJobs?.length < 4) {
       setJobsLimit(prev => prev + 1)
     }
   },[jobs])
@@ -37,9 +37,10 @@ export default function JobsSlides() {
     <View style={styles.container}>
       {/* @ts-ignore */}
       <Carousel
-        layout="stack"
+        layout="default"
+        inactiveSlideScale={0.8}
         onScrollIndexChanged={(index) => setSlideIndex(index)}
-        loop={jobs?.length > 10}
+        loop={uninteractedJobs?.length > 10}
         enableSnap
         layoutCardOffset={0}
         ref={isCarousel}
@@ -48,7 +49,6 @@ export default function JobsSlides() {
         sliderWidth={SLIDER_WIDTH}
         itemWidth={ITEM_WIDTH}
         inactiveSlideShift={0}
-        useScrollView={true}
       />
     </View>
   )
