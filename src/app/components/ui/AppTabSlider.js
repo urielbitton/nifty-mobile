@@ -10,7 +10,7 @@ export default function AppTabSlider(props) {
     return <Tab.Item
       title={item.title}
       titleStyle={{ fontSize: 13, color: index === item.index ? colors.primary : '#333' }}
-      buttonStyle={{ backgroundColor: colors.appBg }}
+      buttonStyle={{ backgroundColor: colors.appBg, padding: 5 }}
       key={i}
     />
   })

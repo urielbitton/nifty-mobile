@@ -7,8 +7,8 @@ import { convertClassicDate } from "app/utils/dateUtils"
 import jobCardBg from "../../../../assets/job-card-bg.png"
 import { Button } from "@rneui/base";
 import { truncateText } from "app/utils/geenralUtils"
-import { StoreContext } from "app/store/store"
 import { firebaseArrayAdd, firebaseArrayRemove, updateDB } from "app/services/crudDB"
+import { StoreContext } from "app/store/store"
 
 export const SLIDER_WIDTH = Dimensions.get('window').width + 90
 export const ITEM_WIDTH = Math.round(SLIDER_WIDTH * 0.75)
@@ -20,6 +20,7 @@ export default function CarouselCard(props) {
     interests, tags, description } = props.item
   const [loading, setLoading] = useState(false)
   const jobIsInterestedByUser = myInterestedJobIDs?.includes(jobID)
+  const jobIsNotInterestedByUser = myNotInterestedJobIDs?.includes(jobID)
 
   const tagsList = tags?.map((tag, index) => {
     return (
@@ -50,7 +51,7 @@ export default function CarouselCard(props) {
   }
 
   const addToNotInterested = () => {
-    if(jobIsInterestedByUser) {
+    if(!jobIsNotInterestedByUser) {
       setLoading(true)
       updateDB('users', myUserID, { 
         interestedJobIDs: firebaseArrayRemove(jobID),
