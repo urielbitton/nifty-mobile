@@ -1,24 +1,25 @@
-import React, { useState } from 'react'
+import { StoreContext } from "app/store/store"
+import React, { useContext, useState } from 'react'
 import { Button, TextInput, View } from "react-native"
 import { auth } from "../firebase/firebase"
 
 export default function Login() {
 
+  const { pageLoading, setPageLoading } = useContext(StoreContext)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
   const [emailError, setEmailError] = useState('')
   const [passwordError, setPasswordError] = useState('')
 
   const handleLogin = () => {  
-    setLoading(true)
+    setPageLoading(true)
     auth.signInWithEmailAndPassword(email, password)
     .then(() => {
-      setLoading(false)
+      setPageLoading(false)
       window.alert('Login successful')
     })
     .catch(err => {
-      setLoading(false)
+      setPageLoading(false)
       switch(err.code) {
         case "auth/invalid-email":
             return setEmailError('Make sure to enter a valid email.')

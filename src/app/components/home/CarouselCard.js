@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext } from 'react'
 import { View, Text, StyleSheet, Image, Dimensions,
   TouchableOpacity } from "react-native"
 import { Feather, AntDesign } from '@expo/vector-icons'
@@ -7,7 +7,7 @@ import { convertClassicDate } from "app/utils/dateUtils"
 import jobCardBg from "../../../../assets/job-card-bg.png"
 import { Button } from "@rneui/base";
 import { truncateText } from "app/utils/geenralUtils"
-import { firebaseArrayAdd, firebaseArrayRemove, updateDB } from "app/services/crudDB"
+import { firebaseArrayAdd, firebaseArrayRemove, setDB, updateDB } from "app/services/crudDB"
 import { StoreContext } from "app/store/store"
 
 export const SLIDER_WIDTH = Dimensions.get('window').width + 90
@@ -15,10 +15,10 @@ export const ITEM_WIDTH = Math.round(SLIDER_WIDTH * 0.75)
 
 export default function CarouselCard(props) {
 
-  const { myUserID, myInterestedJobIDs, myNotInterestedJobIDs } = useContext(StoreContext)
+  const { myUserID, myInterestedJobIDs, myNotInterestedJobIDs, 
+    setPageLoading } = useContext(StoreContext)
   const { jobID, companyName, title, dateCreated,
     interests, tags, description } = props.item
-  const [loading, setLoading] = useState(false)
   const jobIsInterestedByUser = myInterestedJobIDs?.includes(jobID)
   const jobIsNotInterestedByUser = myNotInterestedJobIDs?.includes(jobID)
 
@@ -35,34 +35,47 @@ export default function CarouselCard(props) {
 
   const addToInterested = () => {
     if(!jobIsInterestedByUser) {
-      setLoading(true)
+      setPageLoading(true)
       updateDB('users', myUserID, { 
         interestedJobIDs: firebaseArrayAdd(jobID),
         notInterestedJobIDs: firebaseArrayRemove(jobID)
       })
       .then(() => {
-        setLoading(false)
+        const path = `jobs/${jobID}/interestedUsers`
+        setDB(path, myUserID, {
+          dateCreated: new Date(),
+          isMatched: false,
+          jobID,
+          userID: myUserID
+        })
+        .then(() => {
+          setPageLoading(false)
+        })
+        .catch(err => {
+          console.log(err)
+          setPageLoading(false)
+        })
       })
       .catch(err => {
         console.log(err)
-        setLoading(false)
+        setPageLoading(false)
       })
     }
   }
 
   const addToNotInterested = () => {
     if(!jobIsNotInterestedByUser) {
-      setLoading(true)
+      setPageLoading(true)
       updateDB('users', myUserID, { 
         interestedJobIDs: firebaseArrayRemove(jobID),
         notInterestedJobIDs: firebaseArrayAdd(jobID)
       })
       .then(() => {
-        setLoading(false)
+        setPageLoading(false)
       })
       .catch(err => {
         console.log(err)
-        setLoading(false)
+        setPageLoading(false)
       })
     }
   }

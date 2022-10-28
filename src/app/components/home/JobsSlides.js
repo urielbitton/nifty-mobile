@@ -6,7 +6,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react'
 import { Text } from "react-native"
 import { View, StyleSheet, Dimensions } from "react-native"
 import Carousel from "react-native-snap-carousel"
-import CarouselCard from "../ui/CarouselCard"
+import CarouselCard from "./CarouselCard"
 
 export const SLIDER_WIDTH = Dimensions.get('window').width + 90
 export const ITEM_WIDTH = Math.round(SLIDER_WIDTH * 0.75)

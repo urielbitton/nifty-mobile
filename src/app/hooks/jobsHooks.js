@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { getAllJobs } from "app/services/jobsServices"
+import { getAllJobs, getJobByID, getJobMatches } from "app/services/jobsServices"
 
 export const useAllJobs = (limit) => {
 
@@ -10,4 +10,27 @@ export const useAllJobs = (limit) => {
   },[limit]) 
 
   return jobs
+}
+
+
+export const useJobMatches = (userID, limit) => {
+
+  const [jobMatches, setJobMatches] = useState([])
+
+  useEffect(() => {
+    getJobMatches(userID, setJobMatches, limit)
+  },[userID, limit]) 
+
+  return jobMatches
+}
+
+export const useJob = (jobID) => {
+
+  const [job, setJob] = useState(null)
+
+  useEffect(() => {
+    getJobByID(jobID, setJob)
+  },[jobID]) 
+
+  return job
 }

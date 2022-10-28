@@ -133,18 +133,18 @@ export const getDaysAgo = (date) => {
   return Math.round(msToDays(Date.now()) - msToDays(date))
 }
 
-export const getTimeAgo = (date) => {
+export const getTimeAgo = (date, fullText) => {
   const seconds = Math.floor((Date.now() - date) / 1000)
   if (seconds < 1)
     return 'Just now'
   else if (seconds < 60)
-    return seconds + 's'
+    return fullText ? `${seconds} seconds ago` : `${seconds} s ago`
   else if (seconds < 3600)
-    return Math.floor(seconds / 60) + 'm'
+    return  fullText ? `${Math.floor(seconds / 60)} minutes ago` : `${Math.floor(seconds / 60)}m ago`
   else if (seconds < 86400)
-    return Math.floor(seconds / 3600) + 'h'
+    return fullText ? `${Math.floor(seconds / 3600)} hours ago` : `${Math.floor(seconds / 3600)}h ago`
   else if (seconds < 259200) //if less than 3 days
-    return Math.floor(seconds / 86400) + 'd'
+    return fullText ? `${Math.floor(seconds / 86400)} days ago` : `${Math.floor(seconds / 86400)}d ago`
   else
     return convertClassicDate(date)
 }

@@ -10,6 +10,7 @@ const StoreContextProvider = ({children}) => {
   const user = auth.currentUser
   const [myUser, setMyUser] = useState(null) 
   const [loggingAuth, setLoggingAuth] = useState(true)
+  const [pageLoading, setPageLoading] = useState(false)
   const myUserID = user?.uid
   const myUserName = `${myUser?.firstName} ${myUser?.lastName}`
   const myUserType = myUser?.userType
@@ -35,7 +36,7 @@ const StoreContextProvider = ({children}) => {
     myUserType,
     myInterestedJobIDs, myNotInterestedJobIDs, 
     loggingAuth, setLoggingAuth, 
-    scrollTopRef
+    pageLoading, setPageLoading,
   }}>
     {children}
   </StoreContext.Provider>

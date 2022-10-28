@@ -1,5 +1,5 @@
 import React from 'react'
-import { Text, View, StyleSheet, TouchableOpacity } from "react-native"
+import { View, StyleSheet, TouchableOpacity } from "react-native"
 import { Image } from "react-native"
 import logoOnly from '../../../../assets/logo-only-color.png'
 import { Ionicons } from '@expo/vector-icons';

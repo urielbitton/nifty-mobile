@@ -15,7 +15,7 @@ export default function AppTabSlider(props) {
     />
   })
 
-  const pagesRender = pages.map((page, i) => {
+  const pagesRender = pages?.map((page, i) => {
     return <TabView.Item 
       style={{ width: '100%' }}
       key={i}
