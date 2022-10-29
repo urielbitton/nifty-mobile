@@ -10,18 +10,18 @@ export const msToDays = (ms) => {
 
 export const convertClassicDate = (date, withTime) => {
   if (Platform.OS === 'ios')
-    return date.toLocaleDateString('en-US', {
+    return date?.toLocaleDateString('en-US', {
       weekday: 'short',
       day: 'numeric',
       month: 'long',
       year: 'numeric',
     })
   else {
-    const utc = date.getTime() + date.getTimezoneOffset() * 60000
+    const utc = date?.getTime() + date?.getTimezoneOffset() * 60000
     const US_time = utc + (3600000 * -4)
     const US_date = new Date(US_time)
-    return monthName[US_date.getMonth()] +
-      " " + US_date.getDate() + ", " + US_date.getFullYear()
+    return monthName[US_date?.getMonth()] +
+      " " + US_date?.getDate() + ", " + US_date?.getFullYear()
   }
 }
 

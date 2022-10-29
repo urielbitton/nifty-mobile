@@ -14,7 +14,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState('jobs')
   const rippleColor = colors.darkBlueGray 
   const rippleOverflow = true
-
+ 
   return (
     <Screen style>
       <Navbar />

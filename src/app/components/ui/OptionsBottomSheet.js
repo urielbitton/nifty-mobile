@@ -40,8 +40,7 @@ export default function OptionsBottomSheet(props) {
             {sheetTitle}
           </Text>
           <IconContainer
-            width={30}
-            height={30}
+            dimensions={30}
             backgroundColor="#eee"
             borderRadius={30}
             IconComponent={AntDesign}

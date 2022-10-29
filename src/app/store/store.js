@@ -16,7 +16,6 @@ const StoreContextProvider = ({children}) => {
   const myUserType = myUser?.userType
   const myInterestedJobIDs = myUser?.interestedJobIDs
   const myNotInterestedJobIDs = myUser?.notInterestedJobIDs
-  const scrollTopRef= useRef()
 
   useEffect(() => {
     auth.onAuthStateChanged(user => {

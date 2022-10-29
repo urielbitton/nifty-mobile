@@ -8,12 +8,15 @@ import { getTimeAgo } from "app/utils/dateUtils"
 import TouchIcon from "../ui/TouchIcon"
 import { Pressable } from "react-native"
 import OptionsBottomSheet from "../ui/OptionsBottomSheet"
+import { useNavigation } from "@react-navigation/native"
+import { Vibration } from "react-native"
 
 export default function JobMatchCard(props) {
 
   const { jobID, dateCreated, userID } = props.match
   const [showBottomSheet, setShowBottomSheet] = useState(false)
   const job = useJob(jobID)
+  const navigation = useNavigation()
 
   const matchOptions = [
     {
@@ -23,7 +26,7 @@ export default function JobMatchCard(props) {
     },
     {
       title: 'View Job', 
-      onPress: () => console.log('View Job'),
+      onPress: () => navigation.navigate('Job', {jobID}),
       icon: <Feather name="briefcase" style={{marginRight: 10}} size={24} color="#333" />
     },
     {
@@ -36,7 +39,10 @@ export default function JobMatchCard(props) {
   return (
     <Pressable 
       style={styles.container}
-      onLongPress={() => setShowBottomSheet(true)}
+      onLongPress={() => {
+        Vibration.vibrate(1 * 5)
+        setShowBottomSheet(true)
+      }}
     >
       <View style={styles.left}>
         <View style={styles.iconContainer}>

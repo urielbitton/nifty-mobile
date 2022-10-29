@@ -9,6 +9,7 @@ import { Button } from "@rneui/base";
 import { truncateText } from "app/utils/geenralUtils"
 import { firebaseArrayAdd, firebaseArrayRemove, setDB, updateDB } from "app/services/crudDB"
 import { StoreContext } from "app/store/store"
+import { useNavigation } from "@react-navigation/native"
 
 export const SLIDER_WIDTH = Dimensions.get('window').width + 90
 export const ITEM_WIDTH = Math.round(SLIDER_WIDTH * 0.75)
@@ -21,6 +22,7 @@ export default function CarouselCard(props) {
     interests, tags, description } = props.item
   const jobIsInterestedByUser = myInterestedJobIDs?.includes(jobID)
   const jobIsNotInterestedByUser = myNotInterestedJobIDs?.includes(jobID)
+  const navigation = useNavigation()
 
   const tagsList = tags?.map((tag, index) => {
     return (
@@ -105,11 +107,19 @@ export default function CarouselCard(props) {
           {truncateText(description, 100)}
         </Text>
         <TouchableOpacity 
-          style={styles.readMore}
-          onPress={() => console.log('read more')}
+          style={styles.viewJob}
+          onPress={() => navigation.navigate('Job', { jobID })}
           activeOpacity={0.7}
         >
-          <Text style={styles.readMoreText}>Read more</Text>
+          <Text style={styles.viewJobText}>
+            View Job
+          </Text>
+          <AntDesign 
+            name="arrowright"
+            size={16}
+            color="#333"
+            style={{ marginLeft: 5 }}
+          />
         </TouchableOpacity>
         <View style={styles.infoRow}>
           <Text style={styles.dateText}>Posted On: {convertClassicDate(dateCreated?.toDate())}</Text>
@@ -218,14 +228,16 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     lineHeight: 25,
   },  
-  readMore: {
+  viewJob: {
     paddingVertical: 5,
     paddingHorizontal: 7,
     borderRadius: 5,
     backgroundColor: '#fff',
-    marginTop: 3
+    marginTop: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
   },  
-  readMoreText: {
+  viewJobText: {
     color: '#333',
     fontSize: 12,
   },
