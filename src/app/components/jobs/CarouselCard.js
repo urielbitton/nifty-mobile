@@ -6,7 +6,7 @@ import { colors } from "app/utils/colors"
 import { convertClassicDate } from "app/utils/dateUtils"
 import jobCardBg from "../../../../assets/job-card-bg.png"
 import { Button } from "@rneui/base";
-import { truncateText } from "app/utils/geenralUtils"
+import { truncateText } from "app/utils/generalUtils"
 import { firebaseArrayAdd, firebaseArrayRemove, setDB, updateDB } from "app/services/crudDB"
 import { StoreContext } from "app/store/store"
 import { useNavigation } from "@react-navigation/native"

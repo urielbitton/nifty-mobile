@@ -12,6 +12,7 @@ import Screen from "app/components/layout/Screen"
 import IconContainer from "app/components/ui/IconContainer"
 import { Ionicons } from "@expo/vector-icons"
 import jobScreenBg from '../../../assets/job-screen-header.png'
+import { formatCurrency } from "app/utils/generalUtils"
 
 export default function JobScreen(props) {
 
@@ -35,7 +36,7 @@ export default function JobScreen(props) {
 
   const skillsList = job?.skillsRequired?.map((skill, index) => {
     return <View
-      style={styles.skillRow}
+      style={styles.listRow}
       key={index}
     >
       <IconContainer
@@ -47,10 +48,29 @@ export default function JobScreen(props) {
         iconName="hammer"
         borderRadius={100}
       />
-      <View style={styles.skillTexts}>
-        <Text style={styles.skillName}>{skill.name}</Text>
-        <Text style={styles.skillExperience}>{skill.experience}</Text>
+      <View style={styles.listRowText}>
+        <Text style={styles.listRowName}>{skill.name}</Text>
+        <Text style={styles.listRowSubtitle}>{skill.experience}</Text>
       </View>
+    </View>
+  })
+
+  const benefitsList = job?.benefits?.map((benefit, index) => {
+    return <View
+      style={[styles.listRow, {alignItems: 'center'}]}
+      key={index}
+    >
+      <IconContainer
+        backgroundColor={colors.primary}
+        IconComponent={Ionicons}
+        iconColor="#fff"
+        iconSize={17}
+        dimensions={30}
+        iconName="checkmark-circle"
+        borderRadius={100}
+        style={{marginRight: 10}}
+      />
+      <Text style={styles.listRowName}>{benefit}</Text>
     </View>
   })
 
@@ -81,14 +101,32 @@ export default function JobScreen(props) {
           <Text style={styles.jobType}>{job?.disposition} &#x2022; {job?.jobType}</Text>
           <Text style={styles.jobLocation}>{job?.jobCity}, {job?.jobCountry}</Text>
           <Text style={styles.status}>Job Status: {job?.status}</Text>
-          <View style={styles.skillsSection}>
-            {skillsList}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Salary</Text>
+            <Text style={styles.sectionText}>
+              {formatCurrency(job?.salary?.min, job?.salary?.currency)} - {formatCurrency(job?.salary?.max, job?.salary?.currency)}
+            </Text>
           </View>
-          <Text style={styles.description}>
-            <Text style={styles.descriptionTitle}>Job Description</Text>
-            {"\n"}
-            {job?.description}
-          </Text>
+          <View style={[styles.listSection, styles.section]}>
+            <Text style={styles.sectionTitle}>Experience Required</Text>
+            {
+              job?.skillsRequired?.length > 0 ?
+              skillsList :
+              <Text>No requirements listed.</Text>
+            }
+          </View>
+          <View style={[styles.listSection, styles.section]}>
+            <Text style={styles.sectionTitle}>Benefits</Text>
+            {
+              job?.benefits?.length > 0 ?
+              benefitsList :
+              <Text>No benefits listed.</Text>
+            }
+          </View>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Job Description</Text>
+            <Text style={styles.description}>{job?.description}</Text>
+          </View>
         </View>
         <View style={styles.bottomContent}>
           <Text style={styles.infoTextItem}>Posted On: {convertClassicDate(job?.dateCreated?.toDate())}</Text>
@@ -178,6 +216,20 @@ const styles = StyleSheet.create({
     padding: 20,
     marginTop: 50
   },
+  section: {
+    marginBottom: 40
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 12,
+    color: '#444'
+  },
+  sectionText: {
+    fontSize: 16,
+    fontWeight: '400',
+    color: '#333'
+  },
   jobType: {
     fontSize: 16,
     textTransform: 'capitalize',
@@ -193,22 +245,15 @@ const styles = StyleSheet.create({
     color: '#444',
     fontWeight: '500',
     fontSize: 16,
-    textTransform: 'capitalize'
-  },
-  descriptionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    marginBottom: 10,
-    color: '#444'
+    textTransform: 'capitalize',
+    marginBottom: 40
   },
   description: {
-    marginTop: 10,
-    marginBottom: 30,
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: '400',
     lineHeight: 30,
     color: '#555'
-  },
+  },  
   bottomContent: {
     backgroundColor: colors.blueGray,
     padding: 20,
@@ -264,22 +309,20 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: '#777',
   },
-  skillsSection: {
-    marginTop: 30
-  },
-  skillRow: {
+  listSection: {},
+  listRow: {
     flexDirection: 'row',
     marginBottom: 15
   },
-  skillTexts: {
+  listRowText: {
     marginLeft: 15
   },
-  skillName: {
+  listRowName: {
     fontSize: 16,
     fontWeight: '600',
     color: '#444',
   },
-  skillExperience: {
+  listRowSubtitle: {
     fontSize: 14,
     fontWeight: '400',
     color: '#777',

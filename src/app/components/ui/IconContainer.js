@@ -4,11 +4,12 @@ import { View, StyleSheet } from "react-native"
 export default function IconContainer(props) {
 
   const { dimensions=30, backgroundColor, IconComponent,
-    iconColor, iconSize, iconName, borderRadius, onPress } = props
+    iconColor, iconSize, iconName, borderRadius, onPress,
+    style } = props
 
   return (
     <View
-      style={[styles.container, { width: dimensions, height: dimensions, backgroundColor, borderRadius }]}
+      style={[styles.container, style, { width: dimensions, height: dimensions, backgroundColor, borderRadius }]}
     >
       <IconComponent
         onPress={() => onPress && onPress()}

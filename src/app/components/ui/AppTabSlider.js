@@ -6,7 +6,7 @@ export default function AppTabSlider(props) {
 
   const { index, setIndex, items, pages, animationType="spring" } = props
 
-  const itemsRender = items.map((item, i) => {
+  const itemsRender = items?.map((item, i) => {
     return <Tab.Item
       title={item.title}
       titleStyle={{ fontSize: 13, color: index === item.index ? colors.primary : '#333' }}

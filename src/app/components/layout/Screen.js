@@ -10,7 +10,10 @@ export default function Screen(props) {
 
   return (
     <SafeAreaView style={[styles.screen, style]}>
-      <ScrollView ref={scrollTopRef}>
+      <ScrollView 
+        ref={scrollTopRef}
+        keyboardShouldPersistTaps='always'
+      >
         {children} 
       </ScrollView>
     </SafeAreaView>
