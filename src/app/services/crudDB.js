@@ -37,22 +37,11 @@ export const firebaseArrayRemove = (value) => {
   return firebase.firestore.FieldValue.arrayRemove(value)
 }
 
-export const clearAuthState = (checked) => {
-  return auth.setPersistence(checked ? firebase.auth.Auth.Persistence.LOCAL : firebase.auth.Auth.Persistence.SESSION)
-}
-
 export const signOut = (setLoading) => {
   setLoading(true)
-  clearAuthState(false)
+  auth.signOut()
   .then(() => {
-    auth.signOut()
-    .then(() => {
-      setLoading(false)
-    })
-    .catch(err => {
-      console.log(err)
-      setLoading(false)
-    })
+    setLoading(false)
   })
   .catch(err => {
     console.log(err)

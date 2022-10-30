@@ -1,7 +1,6 @@
 import { useJob } from "app/hooks/jobsHooks"
 import React, { useContext } from 'react'
 import { View, Text, StyleSheet } from "react-native"
-import Constants from 'expo-constants'
 import { Image } from "react-native"
 import { convertClassicDate } from "app/utils/dateUtils"
 import GoBackBar from "app/components/ui/GoBackBar"
@@ -12,6 +11,7 @@ import { StoreContext } from "app/store/store"
 import Screen from "app/components/layout/Screen"
 import IconContainer from "app/components/ui/IconContainer"
 import { Ionicons } from "@expo/vector-icons"
+import jobScreenBg from '../../../assets/job-screen-header.png'
 
 export default function JobScreen(props) {
 
@@ -57,31 +57,45 @@ export default function JobScreen(props) {
   return (
     <Screen>
       <View style={styles.container}>
-        <GoBackBar />
         <View style={styles.intro}>
           <Image
-            source={{ uri: job?.coverImg }}
-            style={styles.coverImg}
+            source={jobScreenBg}
+            style={styles.introBg}
           />
+          <View style={styles.goBackBar}>
+            <GoBackBar 
+              backgroundColor="#fff" 
+              dimensions={35}
+            />
+          </View>
           <Text style={styles.title}>{job?.title}</Text>
           <Text style={styles.companyName}>{job?.companyName}</Text>
+          <View style={styles.coverImgContainer}>
+            <Image
+              source={{ uri: job?.coverImg }}
+              style={styles.coverImg}
+            />
+          </View>
+        </View>
+        <View style={styles.content}>
+          <Text style={styles.jobType}>{job?.disposition} &#x2022; {job?.jobType}</Text>
+          <Text style={styles.jobLocation}>{job?.jobCity}, {job?.jobCountry}</Text>
           <Text style={styles.status}>Job Status: {job?.status}</Text>
           <View style={styles.skillsSection}>
             {skillsList}
           </View>
           <Text style={styles.description}>
             <Text style={styles.descriptionTitle}>Job Description</Text>
-            {"\n"}{"\n"}
+            {"\n"}
             {job?.description}
           </Text>
-          <View style={styles.hr} />
-          <View>
-            <Text style={styles.infoTextItem}>Posted On: {convertClassicDate(job?.dateCreated?.toDate())}</Text>
-            <Text style={styles.infoTextItem}>Interests: {job?.interests}</Text>
-            <Text style={styles.tagsTitle}>Tags</Text>
-            <View style={styles.tagsList}>
-              {tagsList}
-            </View>
+        </View>
+        <View style={styles.bottomContent}>
+          <Text style={styles.infoTextItem}>Posted On: {convertClassicDate(job?.dateCreated?.toDate())}</Text>
+          <Text style={styles.infoTextItem}>Interests: {job?.interests}</Text>
+          <Text style={styles.tagsTitle}>Tags</Text>
+          <View style={styles.tagsList}>
+            {tagsList}
           </View>
           {
             myUserIsInterested &&
@@ -105,50 +119,101 @@ export default function JobScreen(props) {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: Constants.statusBarHeight,
     flex: 1,
-    padding: 20
+  },
+  goBackBar: {
+    paddingTop: 10,
+    paddingHorizontal: 5,
+    zIndex: 10,
+    alignSelf: 'flex-start',
   },
   intro: {
-    width: "100%",
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.blueGray,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    padding: 20,
   },
-  coverImg: {
+  introBg: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
     width: '100%',
-    height: 100,
-    borderRadius: 20
-  },
+    height: '100%',
+  },  
   title: {
     fontSize: 26,
     fontWeight: '600',
-    marginTop: 20
+    color: '#111',
+    maxWidth: 300,
+    textAlign: 'center'
   },
   companyName: {
-    color: colors.darkGrayText,
+    color: '#555',
     fontSize: 20,
     fontWeight: '400',
+    marginTop: 5
+  },
+  coverImgContainer: {
+    elevation: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 10, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    width: 90,
+    height: 90,
+    top: 30,
+    borderRadius: 20,
+    marginBottom: -30,
+    borderColor: '#fff',
+    borderWidth: 3,
+    overflow: 'hidden'
+  },
+  coverImg: {
+    width: '100%',
+    height: '100%',
+  },
+  content: {
+    padding: 20,
+    marginTop: 50
+  },
+  jobType: {
+    fontSize: 16,
+    textTransform: 'capitalize',
+    fontWeight: '500'
+  },
+  jobLocation: {
+    fontSize: 16,
+    marginBottom: 5,
+    color: '#777',
+    fontWeight: '400'
   },
   status: {
-    color: '#999',
-    fontWeight: '400',
-    fontSize: 15,
+    color: '#444',
+    fontWeight: '500',
+    fontSize: 16,
     textTransform: 'capitalize'
   },
   descriptionTitle: {
     fontSize: 18,
     fontWeight: '700',
-    marginBottom: 10
+    marginBottom: 10,
+    color: '#444'
   },
   description: {
-    marginVertical: 30,
+    marginTop: 10,
+    marginBottom: 30,
     fontSize: 17,
     fontWeight: '400',
     lineHeight: 30,
     color: '#555'
   },
-  hr: {
-    borderBottomColor: colors.darkBlueGray,
-    borderBottomWidth: 1,
-    marginVertical: 20
+  bottomContent: {
+    backgroundColor: colors.blueGray,
+    padding: 20,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
   },
   tagsList: {
     flexDirection: 'row',
@@ -165,7 +230,7 @@ const styles = StyleSheet.create({
   infoTextItem: {
     fontSize: 16,
     fontWeight: '400',
-    color: '#777',
+    color: '#333',
     marginBottom: 10
   },
   chipContainer: {
@@ -184,7 +249,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     borderTopColor: colors.darkBlueGray,
     borderTopWidth: 1,
-    paddingTop: 20
+    padding: 20
   },
   userTexts: {
     marginLeft: 15,

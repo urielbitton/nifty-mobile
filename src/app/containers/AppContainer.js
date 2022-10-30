@@ -7,14 +7,14 @@ import { colors } from "app/utils/colors"
 import LoadingModal from "app/components/ui/LoadingModal"
 import { StoreContext } from "app/store/store"
 
-export default function AppContainer({navigation}) {
+export default function AppContainer() {
 
   const { pageLoading } = useContext(StoreContext)
 
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
-      <HomeContainer navigation={navigation}/>
+      <HomeContainer />
       { pageLoading && <LoadingModal /> }
     </View>
   )

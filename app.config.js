@@ -9,4 +9,7 @@ module.exports = {
     messagingSenderId: '215574711968',
     appId: '1:215574711968:web:1108073db3c81cd88a43c5',
   },
+  "android": {
+    "package": "nifty.expo.client"
+  }
 };

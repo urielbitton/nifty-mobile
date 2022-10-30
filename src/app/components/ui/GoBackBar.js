@@ -8,12 +8,13 @@ import { StyleSheet } from "react-native"
 export default function GoBackBar(props) {
 
   const { rightComponent, backgroundColor="#e5e5e5",
-    iconColor="#555", iconSize=20 } = props
+    iconColor="#555", iconSize=20, dimensions } = props
   const navigation = useNavigation()
 
   return (
     <View style={styles.topBar}>
       <IconContainer
+        dimensions={dimensions}
         backgroundColor={backgroundColor}
         IconComponent={AntDesign}
         iconColor={iconColor}
@@ -33,6 +34,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 0,
-    paddingVertical: 20
+    paddingTop: 20,
+    paddingBottom: 15
   },
 })

@@ -1,8 +1,8 @@
 import React, { useContext } from 'react'
 import { StoreContext } from "../store/store" 
-import AuthSwitch from '../auth/AuthSwitch'
-import { Text } from "react-native"
-import AppContainer from './AppContainer'
+import AuthSwitcher from '../auth/AuthSwitcher'
+import LoadingModal from "app/components/ui/LoadingModal"
+import RoutesSwitcher from "./RoutesSwitcher"
 
 export default function AppSwitcher() {
 
@@ -10,9 +10,9 @@ export default function AppSwitcher() {
 
   return (
     user ?
-    <AppContainer /> :
+    <RoutesSwitcher /> :
     myUser === null ?
-    <Text>Loading...</Text> :
-    <AuthSwitch /> 
+    <LoadingModal /> :
+    <AuthSwitcher /> 
   )
 }

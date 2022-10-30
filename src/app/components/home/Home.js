@@ -4,8 +4,8 @@ import { StyleSheet, View, Dimensions } from "react-native"
 import Navbar from "../layout/Navbar"
 import Screen from "../layout/Screen"
 import MenuSwitch from "../ui/MenuSwitch"
-import JobMatches from "./JobMatches"
-import JobsSlides from "./JobsSlides"
+import JobMatches from "../jobs/JobMatches"
+import JobsSlides from "../jobs/JobsSlides"
 
 const screenHeight = Dimensions.get('screen').height - 130
 

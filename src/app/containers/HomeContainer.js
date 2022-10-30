@@ -7,7 +7,7 @@ import { StoreContext } from "app/store/store"
 
 const Tab = createBottomTabNavigator()
 
-export default function HomeContainer({navigation}) {
+export default function HomeContainer() {
 
   const { myUserType } = useContext(StoreContext)
 
@@ -47,6 +47,7 @@ export default function HomeContainer({navigation}) {
   return (
     <Tab.Navigator
       screenOptions={{ headerShown: false }}
+      initialRouteName="Search"
     >
       {tabsBarRender}
     </Tab.Navigator>

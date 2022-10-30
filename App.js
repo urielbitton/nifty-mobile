@@ -1,14 +1,17 @@
 import React from 'react'
 import { StyleSheet, View } from 'react-native'
 import StoreContextProvider from "./src/app/store/store"
-import RoutesSwitcher from "./src/app/containers/RoutesSwitcher"
+import AppSwitcher from "app/containers/AppSwitcher"
+import InstantSearches from "app/containers/InstantSearches"
 
 export default function App() {
 
   return (
     <View style={styles.container}>
       <StoreContextProvider>
-        <RoutesSwitcher />
+        <InstantSearches>
+          <AppSwitcher />
+        </InstantSearches>
       </StoreContextProvider>
     </View>
   )
@@ -19,3 +22,4 @@ const styles = StyleSheet.create({
     flex: 1
   }
 })
+
