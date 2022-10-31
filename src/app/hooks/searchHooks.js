@@ -11,7 +11,6 @@ export function useInstantSearch(query, searchResults, setSearchResults, indexNa
         hitsPerPage
       })
         .then((result) => {
-          console.log(result)
           setSearchResults(result.hits)
           setNumOfHits(result.nbHits)
           setNumOfPages(result.nbPages)

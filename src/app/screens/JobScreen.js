@@ -98,7 +98,7 @@ export default function JobScreen(props) {
           </View>
         </View>
         <View style={styles.content}>
-          <Text style={styles.jobType}>{job?.disposition} &#x2022; {job?.jobType}</Text>
+          <Text style={styles.jobType}>{job?.disposition} &#x2022; {job?.jobType?.replace('-', ' ')}</Text>
           <Text style={styles.jobLocation}>{job?.jobCity}, {job?.jobCountry}</Text>
           <Text style={styles.status}>Job Status: {job?.status}</Text>
           <View style={styles.section}>

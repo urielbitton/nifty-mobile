@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 1,
     shadowRadius: 4.65,
-    elevation: 15,
+    elevation: 10,
     marginBottom: 8,
     borderRadius: 20,
   },
@@ -106,9 +106,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 20,
   },
-  textInfo: {
-
-  },
+  textInfo: {},
   itemRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -136,7 +134,5 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     textTransform: 'capitalize',
   },
-  right: {
-
-  }
+  right: {}
 })

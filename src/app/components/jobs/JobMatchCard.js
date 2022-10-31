@@ -1,4 +1,5 @@
 import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons"
+import { useNavigation } from "@react-navigation/native"
 import { useJob } from "app/hooks/jobsHooks"
 import { convertClassicDate } from "app/utils/dateUtils"
 import React from 'react'
@@ -8,6 +9,7 @@ export default function JobMatchCard(props) {
 
   const { jobID, match, sheetOptions } = props
   const job = useJob(jobID)
+  const navigation = useNavigation()
 
   return <JobCard
     jobID={match?.jobID}
@@ -21,5 +23,6 @@ export default function JobMatchCard(props) {
     SubtitleIcon2={MaterialCommunityIcons}
     subtitleIconName2="calendar-check-outline"
     sheetOptions={sheetOptions}
+    onPress={() => navigation.navigate('Job', {jobID: match.jobID})}
   />
 }
