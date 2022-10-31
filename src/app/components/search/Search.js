@@ -1,5 +1,5 @@
-import { AntDesign, Feather, FontAwesome, Ionicons, 
-  MaterialIcons } from "@expo/vector-icons"
+import { AntDesign, Feather, FontAwesome, 
+  Ionicons, MaterialIcons } from "@expo/vector-icons"
 import { useNavigation } from "@react-navigation/native"
 import { jobsIndex } from "app/algolia"
 import { useInstantSearch } from "app/hooks/searchHooks"
@@ -7,14 +7,18 @@ import { colors } from "app/utils/colors"
 import { formatCurrency } from "app/utils/generalUtils"
 import { LinearGradient } from "expo-linear-gradient"
 import React, { useState } from 'react'
-import { Text, View, StyleSheet, TextInput, Image, Pressable } from "react-native"
+import { Text, View, StyleSheet, TextInput, 
+  Image, Pressable } from "react-native"
 import JobCard from "../jobs/JobCard"
 import Screen from "../layout/Screen"
 import GoBackBar from "../ui/GoBackBar"
 import searchPlaceholder from '../../../../assets/search-placeholder.png'
 import noResultsPlaceholder from '../../../../assets/no-results-placeholder.png'
 import { Button, CheckBox } from "@rneui/themed"
-import { jobEnvironmentOptions, jobTypesOptions } from "app/data/searchFiltersData"
+import { jobEnvironmentOptions, jobTypesOptions, 
+  sortByOptions } from "app/data/searchFiltersData"
+import { Picker } from "@react-native-picker/picker"
+import MultiSlider from "@ptomasroos/react-native-multi-slider"
 
 export default function Search() {
 
@@ -26,21 +30,27 @@ export default function Search() {
   const [numOfHits, setNumOfHits] = useState(0)
   const [hitsPerPage, setHitsPerPage] = useState(10)
   const [loading, setLoading] = useState(false)
-  const [showFilters, setShowFilters] = useState(false)
+  const [showFilters, setShowFilters] = useState(null)
   const [jobType, setJobType] = useState([])
+  const [jobTypeFilter, setJobTypeFilter] = useState([])
   const [jobEnvironment, setJobEnvironment] = useState([])
+  const [jobEnvironmentFilter, setJobEnvironmentFilter] = useState([])
   const [jobCity, setJobCity] = useState('')
   const [jobCityFilter, setJobCityFilter] = useState('')
+  const [salaryRange, setSalaryRange] = useState([0, 1000000])
+  const [salaryRangeFilter, setSalaryRangeFilter] = useState([0, 1000000])
+  const [sortBy, setSortBy] = useState('')
   const navigation = useNavigation()
   const noResultsFound = searchResults.length < 1 && query.length > 0 && !loading
   const hasMoreResults = query.length > 0 && numOfHits > (pageNum + 1) * hitsPerPage
   const emptySearch = query.length < 1 && searchResults.length < 1
 
   const emptyFilter = 'jobType != 0 AND'
-  const jobTypeFilters = jobType.length ? `jobType:${jobType.join(' OR jobType:')} AND` : emptyFilter
-  const jobEnvironmentFilters = jobEnvironment.length ? `disposition:${jobEnvironment.join(' OR disposition:')} AND` : emptyFilter
-  const jobCityFilters = jobCity.length ? `jobCity:${jobCityFilter} AND` : emptyFilter
-  const filters = `${jobTypeFilters} ${jobEnvironmentFilters} ${jobCityFilters} jobType != 0`
+  const jobTypeFilters = jobTypeFilter.length ? `jobType:${jobTypeFilter.join(' OR jobType:')} AND` : emptyFilter
+  const jobEnvironmentFilters = jobEnvironmentFilter.length ? `disposition:${jobEnvironmentFilter.join(' OR disposition:')} AND` : emptyFilter
+  const jobCityFilters = jobCityFilter.length ? `jobCity:${jobCityFilter} AND` : emptyFilter
+  const salaryFilters = `salary.min >= ${salaryRangeFilter[0]} AND salary.max <= ${salaryRangeFilter[1]} AND`
+  const filters = `${jobTypeFilters} ${jobEnvironmentFilters} ${jobCityFilters} ${salaryFilters} jobType != 0`
 
   const jobs = useInstantSearch(
     query,
@@ -97,6 +107,14 @@ export default function Search() {
     />
   })
 
+  const sortByOptionsRender = sortByOptions?.map((option, index) => {
+    return <Picker.Item 
+      label={option.label} 
+      value={option.value} 
+      key={index} 
+    />
+  })
+
   const sheetOptions = (job) => {
     return [
       {
@@ -145,14 +163,28 @@ export default function Search() {
   })
 
   const clearFilters = () => {
-    setJobType([])
-    setJobEnvironment([])
+    setJobTypeFilter([])
+    setJobEnvironmentFilter([])
+    setJobCityFilter('')
+    setSalaryRangeFilter([0, 1000000])
+    setSalaryRange([0, 1000000])
     setShowFilters(false)
   }
 
   const applyFilters = () => {
+    setJobTypeFilter(jobType)
+    setJobEnvironmentFilter(jobEnvironment)
     setJobCityFilter(jobCity)
+    setSalaryRangeFilter(salaryRange)
     setShowFilters(false)
+  }
+
+  const clearSorting = () => {
+
+  }
+
+  const applySorting = () => {
+
   }
 
   return (
@@ -204,46 +236,65 @@ export default function Search() {
             }
           </View>
           <View style={styles.filtersBarSide}>
-            <Feather
-              name="sliders"
+            <AntDesign
+              name="filter"
               size={20}
               color="#fff"
-              style={styles.filterIcon}
-              onPress={() => setShowFilters(prev => !prev)}
+              style={[styles.filterIcon, showFilters === 'filter' && styles.activeFilterIcon]}
+              onPress={() => setShowFilters(prev => prev !== 'filter' ? 'filter' : null)}
             />
             <Ionicons 
               name="ios-filter-outline" 
-              size={20} 
+              size={21} 
               color="#fff" 
-              style={styles.filterIcon}
-              onPress={() => setShowFilters(prev => !prev)}
+              style={[styles.filterIcon, showFilters === 'sort' && styles.activeFilterIcon]}
+              onPress={() => setShowFilters(prev => prev !== 'sort' ? 'sort' : null)}
             />
           </View>
         </View>
         {
-          showFilters &&
+          showFilters === 'filter' &&
           <View style={styles.filtersContainer}>
+            <Text style={styles.filterTitle}>Filter Results</Text>
             <View style={styles.filtersSection}>
               <Text style={styles.filterSectionTitle}>Job Type</Text>
-              <View style={styles.filterSectionItem}>
+              <View>
                 {jobTypesOptionsRender}
               </View>
             </View>
             <View style={styles.filtersSection}>
               <Text style={styles.filterSectionTitle}>Job Environment</Text>
-              <View style={styles.filterSectionItem}>
+              <View>
                 {jobEnvironmentsOptionsRender}
               </View>
             </View>
-            <View style={styles.filtersSection}>
+            <View style={[styles.filtersSection, styles.fullWidthSection]}>
               <Text style={styles.filterSectionTitle}>Job City</Text>
-              <View style={styles.filterSectionItem}>
+              <View>
                 <TextInput
                   style={styles.filtersInput}
                   onChangeText={setJobCity}
                   value={jobCity}
                   placeholder="Job City"
                   placeholderTextColor="rgba(255,255,255,0.7)"
+                />
+              </View>
+            </View>
+            <View style={[styles.filtersSection, styles.fullWidthSection]}>
+              <Text style={styles.filterSectionTitle}>
+                Salary Range: ${formatCurrency(salaryRange[0], '')} - ${formatCurrency(salaryRange[1], '')}
+              </Text>
+              <View style={styles.sliderContainer}>
+                <MultiSlider
+                  isMarkersSeparated={true}
+                  onValuesChangeFinish={(value) => setSalaryRange(value)}
+                  values={salaryRange}
+                  min={10000}
+                  max={1000000}
+                  step={1000}
+                  enableLabel
+                  customMarkerLeft={() => <View style={styles.sliderCircle} />}
+                  customMarkerRight={() => <View style={styles.sliderCircle} />}
                 />
               </View>
             </View>
@@ -266,6 +317,54 @@ export default function Search() {
               title="Apply Filters"
               onPress={() => applyFilters()}
               icon={
+                <Ionicons
+                  name="ios-filter-outline"
+                  size={20}
+                  color="#fff"
+                  style={{marginRight: 10}}
+                />
+              }
+              containerStyle={styles.applyFiltersButtonContainer}
+              buttonStyle={styles.applyFiltersButton}
+            />
+          </View>
+        }
+        {
+          showFilters === 'sort' &&
+          <View style={styles.filtersContainer}>
+            <Text style={styles.filterTitle}>Sort Results</Text>
+            <Text style={styles.filterSectionTitle}>Sort By:</Text>
+            <View style={[styles.filtersSection, styles.pickerContainer]}>
+              <Picker
+                selectedValue={sortBy}
+                onValueChange={(itemValue) => setSortBy(itemValue)}
+                style={styles.picker}
+                dropdownIconColor="#fff"
+                dropdownIconRippleColor="#fff"
+                mode="dropdown"
+              >
+                {sortByOptionsRender}
+              </Picker>
+            </View>
+            <Button
+              title="Clear Sorting"
+              onPress={clearSorting}
+              icon={
+                <MaterialIcons 
+                  name="clear" 
+                  size={20} 
+                  color={colors.primary} 
+                  style={{marginRight: 10}}
+                />
+              }
+              containerStyle={styles.clearFiltersButtonContainer}
+              buttonStyle={styles.clearFiltersButton}
+              titleStyle={{color: colors.primary}}
+            />
+            <Button
+              title="Apply Sorting"
+              onPress={() => applySorting()}
+              icon={
                 <MaterialIcons
                   name="filter-list"
                   size={20}
@@ -280,10 +379,10 @@ export default function Search() {
         }
       </LinearGradient>
       {
-        showFilters && searchResults.length > 0 &&
+        (showFilters === 'filter' || showFilters === 'sort') && searchResults.length > 0 &&
         <Pressable 
           style={styles.searchContentCover} 
-          onPress={() => setShowFilters(false)}
+          onPress={() => setShowFilters(null)}
         />
       }
       <View style={styles.searchContent}>
@@ -339,7 +438,7 @@ const styles = StyleSheet.create({
   searchInput: {
     color: "#fff",
     fontSize: 18,
-    borderColor: 'rgba(255,255,255,0.2)',
+    borderColor: 'rgba(255,255,255,0.4)',
     borderWidth: 1,
     borderRadius: 10,
     padding: 10,
@@ -360,6 +459,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
+  activeFilterIcon: {
+    padding: 5,
+    backgroundColor: 'rgba(255,255,255,0.5)',
+    borderRadius: 8
+  },
   resultsFound: {
     fontSize: 14,
     color: "#fff",
@@ -369,15 +473,45 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   filtersContainer: {
-    paddingVertical: 20,
+    paddingBottom: 15,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
     flexWrap: "wrap",
   },
+  filterTitle: {
+    fontSize: 18,
+    color: "#fff",
+    fontWeight: '600',
+    marginBottom: 20,
+    marginTop: 5,
+    width: '100%',
+    flexBasis: '100%',
+  },
   filtersSection: {
     width: '48%',
     marginBottom: 30,
+  },
+  pickerContainer: {
+    width: '100%',
+    flexBasis: '100%',
+    borderColor: 'rgba(255,255,255,0.5)',
+    borderWidth: 1,
+    borderRadius: 10,
+  },
+  fullWidthSection: {
+    width: '100%',
+    flexBasis: '100%',
+  },
+  sliderContainer: {
+    paddingHorizontal: 10,
+    paddingLeft: 20,
+    width: '100%',
+    marginTop: 25
+  },
+  picker: {
+    color: "#fff",
+    fontSize: 16
   },
   filterSectionTitle: {
     fontSize: 16,
@@ -388,11 +522,11 @@ const styles = StyleSheet.create({
   filtersInput: {
     color: "#fff",
     fontSize: 16,
-    borderColor: 'rgba(255,255,255,0.2)',
+    borderColor: 'rgba(255,255,255,0.5)',
     borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingVertical: 7,
   },
   filtersCheckbox: {
     backgroundColor: 'transparent',
@@ -402,6 +536,12 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 14,
     fontWeight: '400',
+  },
+  sliderCircle: {
+    width: 20,
+    height: 20,
+    borderRadius: 20,
+    backgroundColor: "#fff",
   },
   clearFiltersButtonContainer: {
     flexBasis: '100%',

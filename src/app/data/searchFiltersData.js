@@ -31,3 +31,34 @@ export const jobEnvironmentOptions = [
     value: "hybrid",
   }
 ]
+
+export const sortByOptions = [
+  {
+    label: 'Date Added (Default)',
+    value: "date-added",
+  },
+  {
+    label: 'Salary (High to Low)',
+    value: "salary-high-to-low",
+  },
+  {
+    label: 'Salary (Low to High)',
+    value: "salary-low-to-high",
+  },
+  {
+    label: 'Job Title (A-Z)',
+    value: "job-title-desc",
+  },
+  {
+    label: 'Job Title (Z-A)',
+    value: "job-title-asc",
+  },
+  {
+    label: 'Interests (High to Low)',
+    value: "interests-high-to-low",
+  },
+  {
+    label: 'Interests (Low to High)',
+    value: "interests-low-to-high",
+  },
+]
