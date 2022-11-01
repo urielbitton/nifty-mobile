@@ -21,6 +21,7 @@ import MultiSlider from "@ptomasroos/react-native-multi-slider"
 import { jobEnvironmentOptions, jobTypesOptions } from "app/data/searchFiltersData"
 import { useRef } from "react"
 import GestureBottomSheet from "../ui/GestureBottomSheet"
+import AppCheckbox from "../ui/AppCheckbox"
 
 const screenHeight = Dimensions.get('window').height
 
@@ -32,7 +33,8 @@ export default function Search() {
   const [numOfPages, setNumOfPages] = useState(1)
   const [pageNum, setPageNum] = useState(0)
   const [numOfHits, setNumOfHits] = useState(0)
-  const [hitsPerPage, setHitsPerPage] = useState(10)
+  const hitsLimit = 10
+  const [hitsPerPage, setHitsPerPage] = useState(hitsLimit)
   const [loading, setLoading] = useState(false)
   const [jobType, setJobType] = useState([])
   const [jobTypeFilter, setJobTypeFilter] = useState([])
@@ -107,10 +109,12 @@ export default function Search() {
   })
 
   const sortByOptionsRender = sortByOptions?.map((option, index) => {
-    return <Picker.Item
-      label={option.label}
-      value={option.value}
+    return <AppCheckbox
       key={index}
+      title={option.label}
+      containerStyle={styles.sortByCheckboxContainer}
+      checked={option.value === sortBy}
+      onPress={() => setSortBy(option.value)}
     />
   })
 
@@ -179,11 +183,12 @@ export default function Search() {
   }
 
   const clearSorting = () => {
-    setSortBy('')
+    setSortBy('date-added')
+    sortSheetRef.current.close()
   }
 
   const applySorting = () => {
-
+    sortSheetRef.current.close()
   }
 
   return (
@@ -280,7 +285,7 @@ export default function Search() {
           hasMoreResults ?
             <Button
               title="Load More"
-              onPress={() => setHitsPerPage(prev => prev + 3)}
+              onPress={() => setHitsPerPage(prev => prev + hitsLimit)}
               buttonStyle={styles.loadMoreBtn}
             /> :
             query.length > 0 && !loading && !noResultsFound &&
@@ -382,44 +387,43 @@ export default function Search() {
         height={screenHeight - 100}
         sheetRef={sortSheetRef}
       >
-        <View>
-          <Text>Sort Results</Text>
-          <Text>Sort By:</Text>
-          <View>
-            <Picker
-              selectedValue={sortBy}
-              onValueChange={(itemValue) => setSortBy(itemValue)}
-              dropdownIconColor="#fff"
-              dropdownIconRippleColor="#fff"
-              mode="dropdown"
-            >
+        <View style={styles.filtersContainer}>
+          <Text style={styles.filterTitle}>Sort Results</Text>
+          <View style={styles.filtersSection}>
+            <View style={styles.pickerContainer}>
               {sortByOptionsRender}
-            </Picker>
+            </View>
           </View>
+        </View>
+        <View style={styles.filtersActionsBar}>
           <Button
-            title="Clear Sorting"
+            title="Clear Sort"
             onPress={clearSorting}
             icon={
               <MaterialIcons
                 name="clear"
                 size={20}
-                color={colors.primary}
+                color="#fff"
                 style={{ marginRight: 10 }}
               />
             }
-            titleStyle={{ color: colors.primary }}
+            containerStyle={[styles.filterBtnContainer, styles.bottomFilterBtnContainer]}
+            buttonStyle={styles.clearFiltersBtn}
+            titleStyle={{ color: '#fff' }}
           />
           <Button
-            title="Apply Sorting"
-            onPress={() => applySorting()}
+            title="Apply Sort"
+            onPress={applySorting}
             icon={
-              <MaterialIcons
-                name="filter-list"
+              <Ionicons
+                name="ios-filter-outline"
                 size={20}
                 color="#fff"
                 style={{ marginRight: 10 }}
               />
             }
+            containerStyle={[styles.filterBtnContainer, styles.bottomFilterBtnContainer]}
+            buttonStyle={styles.applyFiltersBtn}
           />
         </View>
       </GestureBottomSheet>
@@ -482,6 +486,7 @@ const styles = StyleSheet.create({
   filtersContainer: {
     padding: 20,
     paddingTop: 10,
+    height: '85%',
   },
   filterTitle: {
     fontSize: 19,
@@ -503,19 +508,24 @@ const styles = StyleSheet.create({
   },
   pickerContainer: {
     width: '100%',
-    flexBasis: '100%',
-    borderColor: 'rgba(0,0,0,0.5)',
-    borderWidth: 1,
-    borderRadius: 10,
+    marginTop: 20
   },
+  sortByCheckboxContainer: {
+    width: '100%',
+    paddingHorizontal: 10,
+    paddingVertical: 15,
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },  
   sliderContainer: {
     paddingHorizontal: 10,
     paddingLeft: 20,
     width: '100%',
     marginTop: 25
   },
-  picker: {
-    fontSize: 16
+  sortPicker: {
+    fontSize: 16,
   },
   filterSectionTitle: {
     fontSize: 16,

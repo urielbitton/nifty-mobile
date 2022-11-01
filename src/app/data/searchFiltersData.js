@@ -46,14 +46,6 @@ export const sortByOptions = [
     value: "salary-low-to-high",
   },
   {
-    label: 'Job Title (A-Z)',
-    value: "job-title-desc",
-  },
-  {
-    label: 'Job Title (Z-A)',
-    value: "job-title-asc",
-  },
-  {
     label: 'Interests (High to Low)',
     value: "interests-high-to-low",
   },
