@@ -47,7 +47,7 @@ export default function HomeContainer() {
   return (
     <Tab.Navigator
       screenOptions={{ headerShown: false }}
-      initialRouteName="Search"
+      initialRouteName="Messages"
     >
       {tabsBarRender}
     </Tab.Navigator>

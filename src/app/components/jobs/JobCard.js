@@ -23,6 +23,7 @@ export default function JobCard(props) {
         Vibration.vibrate(1 * 5)
         setShowBottomSheet(true)
       }}
+      android_ripple={{color: '#eee'}}
       onPress={() => onPress && onPress()}
     >
       <View style={styles.left}>

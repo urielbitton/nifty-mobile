@@ -1,7 +1,6 @@
-import { useJob } from "app/hooks/jobsHooks"
 import React, { useContext } from 'react'
-import { View, Text, StyleSheet } from "react-native"
-import { Image } from "react-native"
+import { View, Text, StyleSheet, Image } from "react-native"
+import { useJob } from "app/hooks/jobsHooks"
 import { convertClassicDate } from "app/utils/dateUtils"
 import GoBackBar from "app/components/ui/GoBackBar"
 import { colors } from "app/utils/colors"
@@ -104,7 +103,7 @@ export default function JobScreen(props) {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Salary</Text>
             <Text style={styles.sectionText}>
-              {formatCurrency(job?.salary?.min, job?.salary?.currency)} - {formatCurrency(job?.salary?.max, job?.salary?.currency)}
+              {formatCurrency(job?.salary?.min, job?.currency?.symbol)} - {formatCurrency(job?.salary?.max, job?.currency?.symbol)}
             </Text>
           </View>
           <View style={[styles.listSection, styles.section]}>

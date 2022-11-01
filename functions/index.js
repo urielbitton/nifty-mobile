@@ -9,6 +9,7 @@ const API_KEY = functions.config().algolia.key
 // @ts-ignore
 const client = algoliasearch(APP_ID, API_KEY)
 const jobsIndex = client.initIndex('jobs_index')
+const usersIndex = client.initIndex('users_index')
 
 //jobs collection
 exports.addToIndexJobs = functions
@@ -30,3 +31,26 @@ exports.deleteFromIndexJobs = functions
   .firestore.document('jobs/{jobID}').onDelete(snapshot => {
     jobsIndex.deleteObject(snapshot.id)
   })
+
+//users collection
+exports.addToIndexUsers = functions
+  .region('northamerica-northeast1')
+  .firestore.document('users/{userID}').onCreate(snapshot => {
+    const data = snapshot.data()
+    const objectID = snapshot.id
+    return usersIndex.saveObject({ ...data, objectID })
+  })
+exports.updateIndexUsers = functions
+  .region('northamerica-northeast1')
+  .firestore.document('users/{userID}').onUpdate((change) => {
+    const newData = change.after.data()
+    const objectID = change.after.id
+    return usersIndex.saveObject({ ...newData, objectID })
+  })
+exports.deleteFromIndexUsers = functions
+  .region('northamerica-northeast1')
+  .firestore.document('users/{userID}').onDelete(snapshot => {
+    usersIndex.deleteObject(snapshot.id)
+  })
+
+  
