@@ -1,18 +1,19 @@
 import { colors } from "app/utils/colors";
 import React, { useContext } from 'react'
-import {SafeAreaView, StyleSheet, ScrollView} from 'react-native'
+import { SafeAreaView, StyleSheet, ScrollView } from 'react-native'
 import { StoreContext } from '../../store/store';
 
 export default function Screen(props) {
 
-  const {scrollTopRef} = useContext(StoreContext)
+  const { scrollRef } = useContext(StoreContext)
   const { children, style } = props
 
   return (
     <SafeAreaView style={[styles.screen, style]}>
       <ScrollView 
-        ref={scrollTopRef}
+        ref={scrollRef}
         keyboardShouldPersistTaps='always'
+        alwaysBounceVertical 
       >
         {children} 
       </ScrollView>
