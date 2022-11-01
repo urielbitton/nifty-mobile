@@ -5,7 +5,6 @@ import {
 } from "@expo/vector-icons"
 import { Button, Chip } from "@rneui/themed"
 import { useNavigation } from "@react-navigation/native"
-import { jobsIndex } from "app/algolia"
 import { useInstantSearch } from "app/hooks/searchHooks"
 import { colors } from "app/utils/colors"
 import { formatCurrency } from "app/utils/generalUtils"
@@ -15,10 +14,9 @@ import JobCard from "../jobs/JobCard"
 import Screen from "../layout/Screen"
 import searchPlaceholder from '../../../../assets/search-placeholder.png'
 import noResultsPlaceholder from '../../../../assets/no-results-placeholder.png'
-import { sortByOptions } from "app/data/searchFiltersData"
-import { Picker } from "@react-native-picker/picker"
 import MultiSlider from "@ptomasroos/react-native-multi-slider"
-import { jobEnvironmentOptions, jobTypesOptions } from "app/data/searchFiltersData"
+import { jobEnvironmentOptions, jobTypesOptions,
+  sortByOptions } from "app/data/searchFiltersData"
 import { useRef } from "react"
 import GestureBottomSheet from "../ui/GestureBottomSheet"
 import AppCheckbox from "../ui/AppCheckbox"
@@ -44,7 +42,8 @@ export default function Search() {
   const [jobCityFilter, setJobCityFilter] = useState('')
   const [salaryRange, setSalaryRange] = useState([0, 1000000])
   const [salaryRangeFilter, setSalaryRangeFilter] = useState([0, 1000000])
-  const [sortBy, setSortBy] = useState('')
+  const [sortBy, setSortBy] = useState(sortByOptions[0])
+  const [sortByIndex, setSortByIndex] = useState(sortByOptions[0].index)
   const filtersSheetRef = useRef(null)
   const sortSheetRef = useRef(null)
   const navigation = useNavigation()
@@ -63,7 +62,7 @@ export default function Search() {
     query,
     searchResults,
     setSearchResults,
-    jobsIndex,
+    sortByIndex,
     filters,
     setNumOfHits,
     setNumOfPages,
@@ -113,8 +112,8 @@ export default function Search() {
       key={index}
       title={option.label}
       containerStyle={styles.sortByCheckboxContainer}
-      checked={option.value === sortBy}
-      onPress={() => setSortBy(option.value)}
+      checked={option.value === sortBy.value}
+      onPress={() => setSortBy(option)}
     />
   })
 
@@ -183,11 +182,12 @@ export default function Search() {
   }
 
   const clearSorting = () => {
-    setSortBy('date-added')
+    setSortBy(sortByOptions[0])
     sortSheetRef.current.close()
   }
 
   const applySorting = () => {
+    setSortByIndex(sortBy.index)
     sortSheetRef.current.close()
   }
 
@@ -384,7 +384,7 @@ export default function Search() {
         </View>
       </GestureBottomSheet>
       <GestureBottomSheet
-        height={screenHeight - 100}
+        height={500}
         sheetRef={sortSheetRef}
       >
         <View style={styles.filtersContainer}>

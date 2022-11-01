@@ -1,3 +1,5 @@
+import { jobsIndex, jobsInterestsAscIndex, jobsInterestsDescIndex, jobsSalaryAscIndex, jobsSalaryDescIndex } from "app/algolia"
+
 export const jobTypesOptions = [
   {
     label: 'Full Time',
@@ -35,22 +37,27 @@ export const jobEnvironmentOptions = [
 export const sortByOptions = [
   {
     label: 'Date Added (Default)',
-    value: "date-added",
+    value: "desc(dateAdded._seconds)",
+    index: jobsIndex
   },
   {
     label: 'Salary (High to Low)',
-    value: "salary-high-to-low",
+    value: "desc(salary.max)",
+    index: jobsSalaryDescIndex
   },
   {
     label: 'Salary (Low to High)',
-    value: "salary-low-to-high",
+    value: "desc(salary.min)",
+    index: jobsSalaryAscIndex
   },
   {
     label: 'Interests (High to Low)',
-    value: "interests-high-to-low",
-  },
+    value: "desc(interests)",
+    index: jobsInterestsDescIndex
+  }, 
   {
     label: 'Interests (Low to High)',
-    value: "interests-low-to-high",
+    value: "asc(interests)",
+    index: jobsInterestsAscIndex
   },
 ]

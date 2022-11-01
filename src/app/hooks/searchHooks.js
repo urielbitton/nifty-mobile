@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 
-export function useInstantSearch(query, searchResults, setSearchResults, indexName, filters, setNumOfHits, setNumOfPages, page, hitsPerPage, setLoading) {
+export function useInstantSearch(query, searchResults, setSearchResults, indexName, 
+  filters, setNumOfHits, setNumOfPages, page, hitsPerPage, setLoading) {
 
   useEffect(() => {
     if (query?.length) {
@@ -8,7 +9,7 @@ export function useInstantSearch(query, searchResults, setSearchResults, indexNa
       indexName.search(query, {
         filters,
         page,
-        hitsPerPage
+        hitsPerPage 
       })
         .then((result) => {
           setSearchResults(result.hits)
@@ -21,7 +22,7 @@ export function useInstantSearch(query, searchResults, setSearchResults, indexNa
           setLoading(false)
         })
     }
-  }, [query, filters, page, hitsPerPage])
+  }, [query, indexName, filters, page, hitsPerPage])
 
   return searchResults
 }

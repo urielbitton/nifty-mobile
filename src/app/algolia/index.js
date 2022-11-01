@@ -7,3 +7,7 @@ export const algoliaSearchClient = algoliasearch(algolia_app_id, algolia_admin_k
 
 
 export const jobsIndex = algoliaSearchClient.initIndex('jobs_index')
+export const jobsSalaryDescIndex = algoliaSearchClient.initIndex('jobs_salary_desc')
+export const jobsSalaryAscIndex = algoliaSearchClient.initIndex('jobs_salary_asc')
+export const jobsInterestsDescIndex = algoliaSearchClient.initIndex('jobs_interests_desc')
+export const jobsInterestsAscIndex = algoliaSearchClient.initIndex('jobs_interests_asc')
