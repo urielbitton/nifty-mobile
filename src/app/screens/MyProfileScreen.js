@@ -7,11 +7,12 @@ import Screen from "../components/layout/Screen"
 
 export default function MyProfileScreen() {
 
-  const { setPageLoading } = useContext(StoreContext)
+  const { setPageLoading, myUserName } = useContext(StoreContext)
 
   return (
     <Screen>
       <Text>My Profile Screen</Text>
+      <Text style={{marginTop: 20, fontSize: 25}}>{myUserName}</Text>
       <Button
         title="Sign Out"
         onPress={() => signOut(setPageLoading)}

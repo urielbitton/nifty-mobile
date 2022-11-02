@@ -8,7 +8,7 @@ export const msToDays = (ms) => {
   return (ms / (60 * 60 * 24 * 1000))
 }
 
-export const convertClassicDate = (date, withTime) => {
+export const convertClassicDate = (date) => {
   if (Platform.OS === 'ios')
     return date?.toLocaleDateString('en-US', {
       weekday: 'short',
@@ -26,12 +26,14 @@ export const convertClassicDate = (date, withTime) => {
 }
 
 export const convertClassicTime = (date) => {
-  return date?.toLocaleTimeString('en-CA', {
-    hour: 'numeric',
-    minute: 'numeric',
-    hour12: true
-  })
-}
+  const time = date?.toLocaleTimeString('en-CA')
+  const hour = time?.split(":")[0]
+  const minute = time?.split(":")[1]
+  if(hour > 12)
+    return (hour - 12) + ":" + minute + " PM"
+  else
+    return hour + ":" + minute + " AM"
+  }
 
 export const convertClassicDateAndTime = (date) => {
   return `${convertClassicDate(date)}, ${convertClassicTime(date)}`
@@ -145,6 +147,16 @@ export const getTimeAgo = (date, fullText) => {
     return fullText ? `${Math.floor(seconds / 3600)} hours ago` : `${Math.floor(seconds / 3600)}h ago`
   else if (seconds < 259200) //if less than 3 days
     return fullText ? `${Math.floor(seconds / 86400)} days ago` : `${Math.floor(seconds / 86400)}d ago`
+  else
+    return convertClassicDate(date)
+}
+
+export const getTimeTextAgo = (date) => {
+  const seconds = Math.floor((Date.now() - date) / 1000)
+  if (seconds < 1)
+    return 'Just now'
+  else if (seconds < 86400)// less than 24 hours  
+    return convertClassicTime(date)
   else
     return convertClassicDate(date)
 }

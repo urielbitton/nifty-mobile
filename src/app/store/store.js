@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { createContext, useEffect, useRef, useState } from 'react'
+import React, { createContext, useEffect, useState } from 'react'
 import { auth } from '../firebase/firebase'
 import { getUserByID } from '../services/userServices'
 
@@ -16,6 +16,7 @@ const StoreContextProvider = ({children}) => {
   const myUserType = myUser?.userType
   const myInterestedJobIDs = myUser?.interestedJobIDs
   const myNotInterestedJobIDs = myUser?.notInterestedJobIDs
+  const photoURLPlaceholder = 'https://firebasestorage.googleapis.com/v0/b/nifty-app-ada6c.appspot.com/o/admin%2Fprofile-placeholder.png?alt=media&token=0f6158fa-3128-41d8-9f15-01039de93448'
 
   useEffect(() => {
     auth.onAuthStateChanged(user => {
@@ -36,6 +37,7 @@ const StoreContextProvider = ({children}) => {
     myInterestedJobIDs, myNotInterestedJobIDs, 
     loggingAuth, setLoggingAuth, 
     pageLoading, setPageLoading,
+    photoURLPlaceholder
   }}>
     {children}
   </StoreContext.Provider>

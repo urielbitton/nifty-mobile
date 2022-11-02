@@ -7,11 +7,12 @@ import { Text, TextInput, View, StyleSheet } from "react-native"
 import { Button } from "@rneui/themed"
 import { useNavigation } from "@react-navigation/native"
 import { colors } from "app/utils/colors"
+import { removeSpacesFromString, validateEmail } from "app/utils/generalUtils"
 
 export default function Register() {
 
-  const { loggingAuth, setLoggingAuth, setMyUser,
-    photoURLPlaceholder, pageLoading, setPageLoading } = useContext(StoreContext)
+  const { loggingAuth, setMyUser, photoURLPlaceholder, 
+    pageLoading, setPageLoading } = useContext(StoreContext)
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
@@ -23,9 +24,20 @@ export default function Register() {
   const [passError, setPassError] = useState('')
   const navigation = useNavigation()
 
+  const allowRegister = firstName.length && 
+    lastName.length && 
+    password === confirmPassword &&
+    password.length >= 5 &&
+    validateEmail(removeSpacesFromString(email))
+
   const clearErrors = () => {
     setEmailError('')
     setPassError('')
+  }
+
+  const catchError = (error) => {
+    setPageLoading(false)
+    console.log(error)
   }
 
   const completeRegistration = (user, authMode, res) => {
@@ -33,7 +45,7 @@ export default function Register() {
       displayName: authMode === 'plain' ? `${firstName} ${lastName}` : authMode === 'google' ? res.additionalUserInfo.profile.name : res.name,
       photoURL: authMode === 'facebook' ? res.picture.data.url : photoURLPlaceholder
     })
-    setDB('users', user.uid, {
+    return setDB('users', user.uid, {
       firstName: authMode === 'plain' ? firstName : authMode === 'google' ? res.additionalUserInfo.profile.given_name : res.first_name,
       lastName: authMode === 'plain' ? lastName : authMode === 'google' ? res.additionalUserInfo.profile.family_name : res.last_name,
       email: authMode === 'plain' ? email : authMode === 'google' ? res.additionalUserInfo.profile.email : res.email,
@@ -55,22 +67,22 @@ export default function Register() {
         name: null,
       }
     })
+    .then(() => {
+      return setDB(`users/${user.uid}/notifications`, 'welcome', {
+        notificationID: 'wellcome',
+        dateCreated: new Date(),
+        icon: 'fas fa-house-user',
+        isRead: false,
+        text: `Welcome to Nifty! We're glad you're here. You can start by searching for jobs right away.`,
+        url: '/',
+        img: '',
+      })
       .then(() => {
-        setDB(`users/${user.uid}/notifications`, 'welcome', {
-          notificationID: 'wellcome',
-          dateCreated: new Date(),
-          icon: 'fas fa-house-user',
-          isRead: false,
-          text: `Welcome to Rentage! We're glad you're here. You can start by searching for properties right away.`,
-          url: '/',
-          img: '',
-        })
         setPageLoading(false)
       })
-      .catch(err => {
-        console.log(err)
-        setPageLoading(false)
-      })
+      .catch(catchError)
+    })
+    .catch(catchError)
   }
 
   const handleSignup = (authMode) => {
@@ -81,13 +93,17 @@ export default function Register() {
         .then((res) => {
           if (res.additionalUserInfo.isNewUser) {
             completeRegistration(res.user, authMode, res)
+            .then(() => {
+              setPageLoading(false)
+            })
+            .catch(catchError)
           }
           else {
             setMyUser(res.user)
           }
         })
         .catch((error) => {
-          console.log(error)
+          catchError(error)
           if (error.code === 'auth/account-exists-with-different-credential')
             window.alert('You have already signed up with a different provider for that email. Please sign in with that provider.')
           else
@@ -100,21 +116,20 @@ export default function Register() {
         .then((res) => {
           const credential = res.credential
           const user = res.user
-          // @ts-ignore
           const accessToken = credential.accessToken
           fetch(`https://graph.facebook.com/me?access_token=${accessToken}&fields=name,first_name,last_name,email,picture.width(720).height(720)`)
             .then(fbRes => fbRes.json())
             .then(fbRes => {
-              console.log(fbRes)
               completeRegistration(user, authMode, fbRes)
+              .then(() => {
+                setPageLoading(false)
+              })
+              .catch(catchError)
             })
-            .catch(err => {
-              console.log(err)
-              setPageLoading(false)
-            })
+            .catch(catchError)
         })
         .catch((err) => {
-          console.log(err)
+          catchError(err)
           if (err.code === 'auth/account-exists-with-different-credential')
             alert('You have already signed up with a different provider. Please sign in with that provider.')
           else if (err.code === 'auth/popup-blocked')
@@ -123,13 +138,17 @@ export default function Register() {
             alert('An error with facebook has occured. Please try again later.')
         })
     }
-    else if (firstName.length && lastName.length && password === confirmPassword && authMode === 'plain') {
+    else if (allowRegister && authMode === 'plain') {
       setPageLoading(true)
-      auth.createUserWithEmailAndPassword(email.replaceAll(' ', ''), password.replaceAll(' ', ''))
+      auth.createUserWithEmailAndPassword(removeSpacesFromString(email), removeSpacesFromString(password))
         .then(() => {
           auth.onAuthStateChanged(user => {
-            if (user && loggingAuth === 'signup') {
+            if (user) {
               completeRegistration(user, authMode)
+              .then(() => {
+                setPageLoading(false)
+              })
+              .catch(catchError)
             }
             else {
               setPageLoading(false)
@@ -137,7 +156,7 @@ export default function Register() {
           })
         })
         .catch(err => {
-          setPageLoading(false)
+          catchError(err)
           switch (err.code) {
             case "auth/email-already-in-use":
               return alert('Please enter a valid email address.')
@@ -165,10 +184,6 @@ export default function Register() {
     clearErrors()
   }, [])
 
-  useEffect(() => {
-    setLoggingAuth('signup')
-  },[])
-
   return (
     <View style={styles.container}>
       <Text>Sign Up</Text>
@@ -189,6 +204,7 @@ export default function Register() {
         value={email}
         onChangeText={setEmail}
         textContentType="emailAddress"
+        autoCapitalize="none"
         style={styles.input}
       />
       <TextInput
@@ -196,6 +212,7 @@ export default function Register() {
         value={password}
         onChangeText={setPassword}
         textContentType="password"
+        autoCapitalize="none"
         secureTextEntry
         style={styles.input}
       />
@@ -204,6 +221,8 @@ export default function Register() {
         value={confirmPassword}
         onChangeText={setConfirmPassword}
         textContentType="password"
+        autoCapitalize="none"
+        onSubmitEditing={handleSubmit}
         secureTextEntry
         style={styles.input}
       />
@@ -213,7 +232,7 @@ export default function Register() {
       <Button 
         title="Sign Up" 
         onPress={handleSubmit} 
-        disabled={pageLoading}
+        disabled={pageLoading || !allowRegister}
         buttonStyle={styles.btn}
         containerStyle={styles.btnContainer}
       />

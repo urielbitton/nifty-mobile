@@ -1,13 +1,21 @@
 import { AntDesign, Ionicons } from "@expo/vector-icons"
 import { useNavigation } from "@react-navigation/native"
+import ChatConsole from "app/components/chats/ChatConsole"
+import ChatRowItem from "app/components/chats/ChatRowItem"
+import GestureBottomSheet from "app/components/ui/GestureBottomSheet"
+import { useChats } from "app/hooks/chatHooks"
+import { StoreContext } from "app/store/store"
 import { colors } from "app/utils/colors"
 import React from 'react'
+import { useContext } from "react"
+import { useRef } from "react"
 import { useState } from "react"
 import { Text, View, StyleSheet, ScrollView, 
   Pressable, TextInput } from "react-native"
 
 export default function ChatScreen() {
 
+  const { myUserID } = useContext(StoreContext)
   const [query, setQuery] = useState('')
   const [searchString, setSearchString] = useState('')
   const [searchResults, setSearchResults] = useState([])
@@ -16,8 +24,18 @@ export default function ChatScreen() {
   const [numOfHits, setNumOfHits] = useState(0)
   const hitsLimit = 10
   const [hitsPerPage, setHitsPerPage] = useState(hitsLimit)
-  const [loading, setLoading] = useState(false)
+  const [messageText, setMessageText] = useState('')
+  const chats = useChats(myUserID)
   const navigation = useNavigation()
+  const sheetRef = useRef(null)
+
+  const chatsList = chats?.map((chat, index) => {
+    return <ChatRowItem
+      key={index}
+      chat={chat}
+      sheetRef={sheetRef}
+    />
+  })
 
   return (
     <View style={styles.container}>
@@ -62,9 +80,15 @@ export default function ChatScreen() {
       </View>
       <ScrollView>
         <View style={styles.chatContent}>
-          
+          {chatsList}
         </View>
       </ScrollView>
+      <GestureBottomSheet
+        height={600}
+        sheetRef={sheetRef}
+      >
+        
+      </GestureBottomSheet>
     </View>
   )
 }
@@ -72,7 +96,7 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    width: '100%',
+    backgroundColor: colors.appBg,
   },
   headerBar: {
     width: '100%',
@@ -118,7 +142,6 @@ const styles = StyleSheet.create({
   //chat content
   chatContent: {
     width: '100%',
-    paddingHorizontal: 15,
     paddingVertical: 10,
     backgroundColor: '#fff',
   }

@@ -11,3 +11,5 @@ export const jobsSalaryDescIndex = algoliaSearchClient.initIndex('jobs_salary_de
 export const jobsSalaryAscIndex = algoliaSearchClient.initIndex('jobs_salary_asc')
 export const jobsInterestsDescIndex = algoliaSearchClient.initIndex('jobs_interests_desc')
 export const jobsInterestsAscIndex = algoliaSearchClient.initIndex('jobs_interests_asc')
+export const usersIndex = algoliaSearchClient.initIndex('users_index')
+export const chatsIndex = algoliaSearchClient.initIndex('chats_index')

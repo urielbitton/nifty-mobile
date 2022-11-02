@@ -20,11 +20,14 @@ import GestureBottomSheet from "app/components/ui/GestureBottomSheet"
 import AppCheckbox from "app/components/ui/AppCheckbox"
 import { useEffect } from "react"
 import JobCard from "app/components/jobs/JobCard"
+import { useContext } from "react"
+import { StoreContext } from "app/store/store"
 
 const screenHeight = Dimensions.get('window').height
 
 export default function SearchScreen() {
 
+  const { pageLoading, setPageLoading } = useContext(StoreContext)
   const route = useRoute()
   const [query, setQuery] = useState('')
   const [searchString, setSearchString] = useState('')
@@ -34,7 +37,6 @@ export default function SearchScreen() {
   const [numOfHits, setNumOfHits] = useState(0)
   const hitsLimit = 10
   const [hitsPerPage, setHitsPerPage] = useState(hitsLimit)
-  const [loading, setLoading] = useState(false)
   const [jobType, setJobType] = useState([])
   const [jobTypeFilter, setJobTypeFilter] = useState([])
   const [jobEnvironment, setJobEnvironment] = useState([])
@@ -48,7 +50,7 @@ export default function SearchScreen() {
   const filtersSheetRef = useRef(null)
   const sortSheetRef = useRef(null)
   const navigation = useNavigation()
-  const noResultsFound = searchResults.length < 1 && query.length > 0 && !loading
+  const noResultsFound = searchResults.length < 1 && query.length > 0 && !pageLoading
   const hasMoreResults = query.length > 0 && numOfHits > (pageNum + 1) * hitsPerPage
   const emptySearch = query.length < 1 && searchResults.length < 1
 
@@ -69,7 +71,7 @@ export default function SearchScreen() {
     setNumOfPages,
     pageNum,
     hitsPerPage,
-    setLoading
+    setPageLoading
   )
 
   const jobTypesOptionsRender = jobTypesOptions.map((option, index) => {
@@ -200,7 +202,7 @@ export default function SearchScreen() {
   },[route?.params])
 
   return (
-    <View>
+    <View style={styles.container}>
       <LinearGradient
         colors={[colors.primary, colors.darkPrimary]}
         style={styles.header}
@@ -273,7 +275,7 @@ export default function SearchScreen() {
       </LinearGradient>
       <ScrollView contentContainerStyle={styles.searchContent}>
         { 
-          query.length > 0 && !loading &&
+          query.length > 0 && !pageLoading &&
           <Text style={styles.resultsFound}>{numOfHits} results found</Text>
         }
         <View style={styles.searchResults}>
@@ -296,7 +298,7 @@ export default function SearchScreen() {
               onPress={() => setHitsPerPage(prev => prev + hitsLimit)}
               buttonStyle={styles.loadMoreBtn}
             /> :
-            query.length > 0 && !loading && !noResultsFound &&
+            query.length > 0 && !pageLoading && !noResultsFound &&
             <Text style={styles.endOfResults}>You've reached the end of the results</Text>
         }
         {
@@ -440,6 +442,10 @@ export default function SearchScreen() {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.appBg,
+  },  
   header: {
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
