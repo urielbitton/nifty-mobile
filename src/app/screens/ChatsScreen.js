@@ -25,6 +25,8 @@ export default function ChatScreen() {
   const hitsLimit = 10
   const [hitsPerPage, setHitsPerPage] = useState(hitsLimit)
   const [messageText, setMessageText] = useState('')
+  const [showNewChatModal, setShowNewChatModal] = useState(false)
+  const [chatDetails, setChatDetails] = useState(null)
   const chats = useChats(myUserID)
   const navigation = useNavigation()
   const sheetRef = useRef(null)
@@ -33,6 +35,7 @@ export default function ChatScreen() {
     return <ChatRowItem
       key={index}
       chat={chat}
+      setChatDetails={setChatDetails}
       sheetRef={sheetRef}
     />
   })
@@ -43,8 +46,8 @@ export default function ChatScreen() {
         <Text style={styles.mainTitle}>Messages</Text>
         <Pressable 
           style={styles.newChatButton}
-          onPress={() => navigation.navigate("NewChat")}
-          android_ripple={{color: '#ddd'}}
+          onPress={() => setShowNewChatModal(true)}
+          android_ripple={{color: '#ddd', borderless: true}}
         >
           <AntDesign name="plus" size={19} color="black" />
         </Pressable>
@@ -53,6 +56,7 @@ export default function ChatScreen() {
         <TextInput
           onChangeText={(text) => setSearchString(text)}
           returnKeyLabel="Search"
+          placeholder="Search"
           cursorColor="#ccc"
           value={searchString}
           style={styles.searchInput}
@@ -87,7 +91,7 @@ export default function ChatScreen() {
         height={600}
         sheetRef={sheetRef}
       >
-        
+        <Text>Chat ID: {chatDetails?.chatID}</Text>
       </GestureBottomSheet>
     </View>
   )
@@ -131,7 +135,7 @@ const styles = StyleSheet.create({
     padding: 7,
     paddingLeft: 20,
     borderRadius: 40,
-    backgroundColor: '#eee',
+    backgroundColor: '#f1f1f1',
     fontSize: 16,
   },
   searchIcon: {

@@ -9,7 +9,7 @@ export default function AppCheckbox(props) {
 
   return (
     <Pressable 
-      android_ripple={{color: "#ccc"}}
+      android_ripple={{color: "#ccc", borderless: true}}
       style={[styles.container, containerStyle]}
       onPress={() => onPress()}
     >

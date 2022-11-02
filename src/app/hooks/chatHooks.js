@@ -7,7 +7,8 @@ export const useChat = (chatID) => {
   const [chat, setChat] = useState(null)
 
   useEffect(() => {
-    getChatByID(chatID, setChat)
+    if(chatID)
+      getChatByID(chatID, setChat)
   },[chatID]) 
 
   return chat

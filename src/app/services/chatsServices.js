@@ -28,7 +28,7 @@ export const getChatsByUserID = (userID, setChats, limit) => {
 
 export const getChatByID = (chatID, setChat) => {
   db.collection('chats')
-    .doc(chatID?.length ? chatID : 'na')
+    .doc(chatID)
     .onSnapshot(snapshot => {
       setChat(snapshot.data())
     })
@@ -71,7 +71,6 @@ export const getUnreadChatsByUserID = (userID, setUnreadChats) => {
     .where('members', 'array-contains', userID)
     .where('lastSenderID', '!=', userID)
     .where('isArchived', '==', false)
-    .where('isRead', '==', false)
     .onSnapshot(snapshot => {
       setUnreadChats(snapshot.docs.map(doc => doc.data()))
     })
@@ -190,7 +189,6 @@ export const createConversation = (chatPath, members, searchNames) => {
     dateCreated: new Date(),
     isArchived: false,
     isDeleted: false,
-    isRead: false,
     isGroup: members.length > 2,
     lastActive: new Date(),
     lastMessage: '',
@@ -198,8 +196,6 @@ export const createConversation = (chatPath, members, searchNames) => {
     lastSenderID: members[0],
     members,
     searchNames,
-    nicknames: [],
-    mutedUsers: [],
     seenBy: [members[0]],
   })
   .then(() => {
