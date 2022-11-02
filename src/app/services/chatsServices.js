@@ -4,17 +4,6 @@ import { extractAllLinksFromText } from "app/utils/generalUtils"
 import { getRandomDocID, setDB, updateDB } from "./crudDB"
 import { uploadMultipleFilesToFireStorage } from "./storageServices"
 
-export const getChatsByFamilyID = (familyID, setChats, limit) => {
-  db.collection('families')
-    .doc(familyID)
-    .collection('chats')
-    .orderBy('lastActive', 'desc')
-    .limit(limit)
-    .onSnapshot(snapshot => {
-      setChats(snapshot.docs.map(doc => doc.data()))
-    })
-}
-
 export const getChatsByUserID = (userID, setChats, limit) => {
   db.collection('chats')
     .where('members', 'array-contains', userID)
@@ -34,46 +23,25 @@ export const getChatByID = (chatID, setChat) => {
     })
 }
 
-export const getFamilyChatByID = (familyID, chatID, setChat) => {
-  db.collection('families')
-    .doc(familyID)
-    .collection('chats')
-    .doc(chatID)
-    .onSnapshot(snapshot => {
-      setChat(snapshot.data())
-    })
-}
-
-export const getMessagesByChatID = (path, setMessages, limit) => {
-  db.collection(path)
-    .orderBy('messageDate', 'desc')
-    .limit(limit)
-    .onSnapshot(snapshot => {
-      setMessages(snapshot.docs.map(doc => doc.data()))
-    })
-}
-
-export const getLastMessageByChatID = (familyID, chatID, setLastMessage) => {
-  db.collection('families')
-    .doc(familyID)
-    .collection('chats')
-    .doc(chatID)
-    .collection('messages')
-    .orderBy('messageDate', 'desc')
-    .limit(1)
-    .onSnapshot(snapshot => {
-      setLastMessage(snapshot.docs.map(doc => doc.data()[0]))
-    })
+export const getMessagesByChatID = (chatID, setMessages, limit) => {
+  db.collection('chats')
+  .doc(chatID)
+  .collection('messages')
+  .orderBy('messageDate', 'desc')
+  .limit(limit)
+  .onSnapshot(snapshot => {
+    setMessages(snapshot.docs.map(doc => doc.data()))
+  })
 }
 
 export const getUnreadChatsByUserID = (userID, setUnreadChats) => {
   db.collection('chats')
-    .where('members', 'array-contains', userID)
-    .where('lastSenderID', '!=', userID)
-    .where('isArchived', '==', false)
-    .onSnapshot(snapshot => {
-      setUnreadChats(snapshot.docs.map(doc => doc.data()))
-    })
+  .where('members', 'array-contains', userID)
+  .where('lastSenderID', '!=', userID)
+  .where('isArchived', '==', false)
+  .onSnapshot(snapshot => {
+    setUnreadChats(snapshot.docs.map(doc => doc.data()))
+  })
 }
 
 export const getChatMediasByChatID = (path, setChatMedias, limit) => {
@@ -109,7 +77,8 @@ export const getChatLinksByChatID = (path, setChatLinks, limit) => {
 export const sendChatMessage = (messageText, uploadedImgFiles, messagePath, chatPath, 
   chatID, storagePath, myUser, isCombined, insertTimestamp) => {
   const messageLinks = extractAllLinksFromText(messageText)
-  const uncompressedVideos = uploadedImgFiles?.filter(img => img.file.type.includes('video'))?.map(vid => vid.file)
+  // const uncompressedVideos = uploadedImgFiles?.filter(img => img.file.type.includes('video'))?.map(vid => vid.file)
+  const uncompressedVideos = []
   return compressImages(uploadedImgFiles)
     .then(compressedImgs => {
       return uploadMultipleFilesToFireStorage([...compressedImgs, ...uncompressedVideos], storagePath)
@@ -160,9 +129,10 @@ export const sendChatMessage = (messageText, uploadedImgFiles, messagePath, chat
           .then(() => {
             return updateDB(chatPath, chatID, {
               lastActive: new Date(),
-              seenBy: [myUser.userID],
+              seenByDate: [{userID: myUser?.userID, date: new Date()}],
               lastMessage: messageText,
               lastMessageDate: new Date(),
+              lastMessageID: docID,
               lastSenderID: myUser?.userID,
               isRead: false
             })
@@ -192,11 +162,12 @@ export const createConversation = (chatPath, members, searchNames) => {
     isGroup: members.length > 2,
     lastActive: new Date(),
     lastMessage: '',
+    lastMessageID: '',
     lastMessageDate: new Date(),
     lastSenderID: members[0],
     members,
     searchNames,
-    seenBy: [members[0]],
+    seenByDate: [{userID: members[0], date: new Date()}],
   })
   .then(() => {
     return docID

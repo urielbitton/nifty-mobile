@@ -1,10 +1,8 @@
 import React, { useContext } from 'react'
 import { Pressable, View, StyleSheet, Text, Image, Vibration } from "react-native"
-import { FontAwesome } from "@expo/vector-icons"
 import { useNavigation } from "@react-navigation/native"
 import { useUser } from "app/hooks/userHooks"
 import { StoreContext } from "app/store/store"
-import { colors } from "app/utils/colors"
 import { getTimeTextAgo } from "app/utils/dateUtils"
 import { truncateText } from "app/utils/generalUtils"
 import AppAvatar from "../ui/AppAvatar"
@@ -13,11 +11,12 @@ export default function ChatRowItem(props) {
 
   const { myUserID } = useContext(StoreContext)
   const { members, lastMessage, lastMessageDate, lastSenderID,
-    seenBy, chatID } = props.chat
+    seenByDate, chatID } = props.chat
   const { sheetRef, setChatDetails } = props
   const otherUserID = members.filter(userID => userID !== myUserID)[0]
   const otherUser = useUser(otherUserID)
-  const otherUserHasSeen = seenBy?.includes(otherUserID)
+  const otherUserHasSeen = seenByDate?.find(seen => seen.userID === otherUserID)
+  const myUserHasSeen = seenByDate?.find(seen => seen.userID === myUserID)
   const navigation = useNavigation()
 
   return (
@@ -40,7 +39,7 @@ export default function ChatRowItem(props) {
         />
         <View style={styles.infoContainer}>
           <Text style={styles.userName}>{otherUser?.firstName} {otherUser?.lastName}</Text>
-          <Text style={styles.lastMessageText}>
+          <Text style={[styles.messageText, !myUserHasSeen && styles.unseenMessageText]}>
             {lastSenderID === myUserID ? 'You: ' : ''}
             {truncateText(lastMessage, 30)}
           </Text>
@@ -49,16 +48,13 @@ export default function ChatRowItem(props) {
       </View>
       <View style={styles.right}>
         {
-          lastSenderID === myUserID && !otherUserHasSeen ?
-          <FontAwesome
-            name="check-circle"
-            size={17}
-            color={colors.darkBlueGray}
-          /> :
+          lastSenderID === myUserID && otherUserHasSeen ?
           <Image
             source={{ uri: otherUser?.photoURL }}
             style={styles.seenAvatar}
-          />
+          /> : 
+          !myUserHasSeen &&
+          <View style={styles.unseenDot} />
         }
       </View>
     </Pressable>
@@ -84,9 +80,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
   },
-  lastMessageText: {
+  messageText: {
     fontSize: 14,
     color: '#444',
+  },
+  unseenMessageText: {
+    fontWeight: '600',
   },
   timestamp: {
     fontSize: 12,
@@ -100,5 +99,11 @@ const styles = StyleSheet.create({
     width: 17,
     height: 17,
     borderRadius: 17,
+  },
+  unseenDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 10,
+    backgroundColor: '#007aff',
   }
 })

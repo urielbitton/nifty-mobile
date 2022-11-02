@@ -1,4 +1,4 @@
-import { getChatByID, getChatsByUserID } from "app/services/chatsServices"
+import { getChatByID, getChatsByUserID, getMessagesByChatID } from "app/services/chatsServices"
 import { useEffect } from "react"
 import { useState } from "react"
 
@@ -14,13 +14,25 @@ export const useChat = (chatID) => {
   return chat
 }
 
-export const useChats = (userID) => {
+export const useChats = (userID, limit) => {
 
   const [chats, setChats] = useState([])
 
   useEffect(() => {
-    getChatsByUserID(userID, setChats)
-  },[userID]) 
+    getChatsByUserID(userID, setChats, limit)
+  },[userID, limit]) 
 
   return chats
+}
+
+export const useChatMessages = (chatID, limit) => {
+
+  const [messages, setMessages] = useState([])
+
+  useEffect(() => {
+    if(chatID)
+      getMessagesByChatID(chatID, setMessages, limit)
+  },[chatID, limit]) 
+
+  return messages
 }

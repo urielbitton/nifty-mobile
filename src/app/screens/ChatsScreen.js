@@ -26,8 +26,9 @@ export default function ChatScreen() {
   const [hitsPerPage, setHitsPerPage] = useState(hitsLimit)
   const [messageText, setMessageText] = useState('')
   const [showNewChatModal, setShowNewChatModal] = useState(false)
+  const [chatsLimit, setChatsLimit] = useState(10)
   const [chatDetails, setChatDetails] = useState(null)
-  const chats = useChats(myUserID)
+  const chats = useChats(myUserID, chatsLimit)
   const navigation = useNavigation()
   const sheetRef = useRef(null)
 

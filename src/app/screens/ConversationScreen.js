@@ -1,24 +1,51 @@
 import { AntDesign, Ionicons } from "@expo/vector-icons"
 import { useNavigation } from "@react-navigation/native"
 import ChatConsole from "app/components/chats/ChatConsole"
+import MessageItem from "app/components/chats/MessageItem"
 import AppAvatar from "app/components/ui/AppAvatar"
+import { useChatMessages } from "app/hooks/chatHooks"
 import { useUser } from "app/hooks/userHooks"
+import { firebaseArrayAdd, updateDB } from "app/services/crudDB"
 import { StoreContext } from "app/store/store"
 import { colors } from "app/utils/colors"
 import { getTimeAgo } from "app/utils/dateUtils"
 import React, { useContext } from 'react'
+import { useEffect } from "react"
 import { useState } from "react"
-import { View, StyleSheet, Text, Pressable, ScrollView, } from "react-native"
+import { View, StyleSheet, Text, Pressable, 
+  ScrollView } from "react-native"
 
 export default function ConversationScreen(props) {
 
   const { myUserID } = useContext(StoreContext)
   const { chat } = props.route.params
   const [messageText, setMessageText] = useState("")
+  const [uploadedImg, setUploadedImg] = useState(null)
+  const [messagesLimit, setMessagesLimit] = useState(10)
   const otherUserID = chat?.members?.filter(userID => userID !== myUserID)[0]
   const otherUser = useUser(otherUserID)
+  const messages = useChatMessages(chat?.chatID, messagesLimit)
+  const myUserHasSeen = chat?.seenByDate?.find(seen => seen.userID === myUserID)
   const navigation = useNavigation()
-  const uploadedImgs = []
+
+  const messagesList = messages?.map((message, index) => {
+    return <MessageItem
+      key={index}
+      message={message}
+      chat={chat}
+    />
+  })
+
+  useEffect(() => {
+    if(!myUserHasSeen) {
+      updateDB('chats', chat?.chatID, {
+        seenByDate: firebaseArrayAdd({
+          userID: myUserID,
+          date: new Date()
+        })
+      })
+    }
+  },[myUserHasSeen])
 
   return (
     <View style={styles.container}>
@@ -56,13 +83,19 @@ export default function ConversationScreen(props) {
         </View>
       </View>
       <ScrollView>
-        
+        <View style={styles.messagesList}>
+          {messagesList}
+        </View>
       </ScrollView>
       <ChatConsole
+        messagePath={`chats/${chat?.chatID}/messages`}
+        chatPath="chats"
+        storagePath={`chats/${chat?.chatID}/messages`}
         chatID={chat?.chatID}
         messageText={messageText}
         setMessageText={setMessageText}
-        uploadedImgs={[]}
+        uploadedImg={uploadedImg}
+        setUploadedImg={setUploadedImg}
       />
     </View>
   )
@@ -115,7 +148,9 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.darkGrayText
   },
-  headerRight: {
-
+  headerRight: {},
+  messagesList: {
+    padding: 10,
+    flexDirection: 'column-reverse',
   }
 })
