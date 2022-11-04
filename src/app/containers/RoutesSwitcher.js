@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import AppContainer from "./AppContainer"
 import JobScreen from "app/screens/JobScreen"
 import ConversationScreen from "app/screens/ConversationScreen"
+import NewChatScreen from "app/screens/NewChatScreen"
 
 const Stack = createNativeStackNavigator()
 
@@ -14,6 +15,7 @@ export default function RoutesSwitcher() {
         <Stack.Screen name="App" component={AppContainer} />
         <Stack.Screen name="Job" component={JobScreen} />
         <Stack.Screen name="Conversation" component={ConversationScreen} />
+        <Stack.Screen name="NewChatScreen" component={NewChatScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   )

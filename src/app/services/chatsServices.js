@@ -145,10 +145,21 @@ export const sendChatMessage = (messageText, uploadedImgFiles, messagePath, chat
 
 export const findExistingChat = (chatPath, usersArray) => {
   return db.collection(chatPath)
-    .where('members', '==', usersArray)
-    .get()
-    .then(snapshot => snapshot.empty ? null : snapshot.docs[0].data())
-    .catch(err => console.log(err))
+  .where('members', '==', usersArray)
+  .get()
+  .then(snapshot => snapshot.empty ? null : snapshot.docs[0].data())
+  .then((chat) => {
+    if(chat) {
+      return chat
+    }
+    else {
+      return db.collection(chatPath)
+      .where('members', '==', usersArray.reverse())
+      .get()
+      .then(snapshot => snapshot.empty ? null : snapshot.docs[0].data())
+    }
+  })
+  .catch(err => console.log(err))
 }
 
 export const createConversation = (chatPath, members, searchNames) => {

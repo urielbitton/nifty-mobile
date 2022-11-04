@@ -8,12 +8,13 @@ import { colors } from "app/utils/colors"
 import * as ImagePicker from 'expo-image-picker'
 import { isDateGreaterThanXTimeAgo, isDateLessThanXTimeAgo } from "app/utils/dateUtils"
 import IconContainer from "../ui/IconContainer"
+import { useEffect } from "react"
 
 export default function ChatConsole(props) {
 
   const { setPageLoading, myUser, myUserID } = useContext(StoreContext)
   const { messageText, setMessageText, uploadedImg, setUploadedImg,
-    messagePath, chatPath, chatID, storagePath } = props
+    messagePath, chatPath, chatID, storagePath, scrollRef } = props
   const chat = useChat(chatID)
   const isNotEmptyMessage = /\S/.test(messageText)
   const threeMinutes = 1000 * 60 * 3
@@ -38,6 +39,7 @@ export default function ChatConsole(props) {
         insertTimestamp
       )
       .then(() => {
+        scrollRef.current.scrollToEnd({animated: true})
         setPageLoading(false)
         setMessageText('')
       })
@@ -63,7 +65,6 @@ export default function ChatConsole(props) {
   const launchCamera = async () => {
     
   }
-
 
   return (
     <View style={styles.container}>

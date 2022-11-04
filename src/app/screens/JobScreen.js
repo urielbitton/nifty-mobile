@@ -2,7 +2,6 @@ import React, { useContext } from 'react'
 import { View, Text, StyleSheet, Image } from "react-native"
 import { useJob } from "app/hooks/jobsHooks"
 import { convertClassicDate } from "app/utils/dateUtils"
-import GoBackBar from "app/components/ui/GoBackBar"
 import { colors } from "app/utils/colors"
 import { Avatar, Button } from "@rneui/themed"
 import { useNavigation } from "@react-navigation/native"
@@ -12,6 +11,7 @@ import IconContainer from "app/components/ui/IconContainer"
 import { Ionicons } from "@expo/vector-icons"
 import jobScreenBg from '../../../assets/job-screen-header.png'
 import { formatCurrency } from "app/utils/generalUtils"
+import GoBackBtn from "app/components/ui/GoBackBtn"
 
 export default function JobScreen(props) {
 
@@ -67,6 +67,7 @@ export default function JobScreen(props) {
         dimensions={30}
         iconName="checkmark-circle"
         borderRadius={100}
+        rippleColor="transparent"
         style={{marginRight: 10}}
       />
       <Text style={styles.listRowName}>{benefit}</Text>
@@ -82,8 +83,9 @@ export default function JobScreen(props) {
             style={styles.introBg}
           />
           <View style={styles.goBackBar}>
-            <GoBackBar 
+            <GoBackBtn 
               backgroundColor="#fff" 
+              rippleColor="#eee"
               dimensions={35}
             />
           </View>
@@ -160,6 +162,7 @@ const styles = StyleSheet.create({
   },
   goBackBar: {
     paddingTop: 10,
+    marginTop: 10,
     paddingHorizontal: 5,
     zIndex: 10,
     alignSelf: 'flex-start',

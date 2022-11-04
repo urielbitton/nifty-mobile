@@ -3,6 +3,7 @@ import { useNavigation } from "@react-navigation/native"
 import ChatConsole from "app/components/chats/ChatConsole"
 import ChatRowItem from "app/components/chats/ChatRowItem"
 import GestureBottomSheet from "app/components/ui/GestureBottomSheet"
+import IconContainer from "app/components/ui/IconContainer"
 import { useChats } from "app/hooks/chatHooks"
 import { StoreContext } from "app/store/store"
 import { colors } from "app/utils/colors"
@@ -10,8 +11,10 @@ import React from 'react'
 import { useContext } from "react"
 import { useRef } from "react"
 import { useState } from "react"
-import { Text, View, StyleSheet, ScrollView, 
-  Pressable, TextInput } from "react-native"
+import {
+  Text, View, StyleSheet, ScrollView,
+  Pressable, TextInput
+} from "react-native"
 
 export default function ChatScreen() {
 
@@ -25,7 +28,6 @@ export default function ChatScreen() {
   const hitsLimit = 10
   const [hitsPerPage, setHitsPerPage] = useState(hitsLimit)
   const [messageText, setMessageText] = useState('')
-  const [showNewChatModal, setShowNewChatModal] = useState(false)
   const [chatsLimit, setChatsLimit] = useState(10)
   const [chatDetails, setChatDetails] = useState(null)
   const chats = useChats(myUserID, chatsLimit)
@@ -45,13 +47,17 @@ export default function ChatScreen() {
     <View style={styles.container}>
       <View style={styles.headerBar}>
         <Text style={styles.mainTitle}>Messages</Text>
-        <Pressable 
-          style={styles.newChatButton}
-          onPress={() => setShowNewChatModal(true)}
-          android_ripple={{color: '#ddd', borderless: true}}
-        >
-          <AntDesign name="plus" size={19} color="black" />
-        </Pressable>
+        <IconContainer
+          dimensions={30}
+          IconComponent={AntDesign}
+          iconColor="#333"
+          iconSize={22}
+          iconName="plus"
+          borderRadius={100}
+          rippleColor="#ddd"
+          borderlessRipple
+          onPress={() => navigation.navigate('NewChatScreen')}
+        />
       </View>
       <View style={styles.searchBar}>
         <TextInput
@@ -64,23 +70,23 @@ export default function ChatScreen() {
         />
         {
           searchString.length > 0 ?
-          <Ionicons
-            name="close-circle"
-            size={22}
-            color="#aaa"
-            onPress={() => {
-              setSearchString('')
-              setQuery('')
-              setSearchResults([])
-            }}
-            style={styles.searchIcon}
-          /> :
-          <Ionicons
-            name="search"
-            size={20}
-            color="#aaa"
-            style={styles.searchIcon}
-          />
+            <Ionicons
+              name="close-circle"
+              size={22}
+              color="#aaa"
+              onPress={() => {
+                setSearchString('')
+                setQuery('')
+                setSearchResults([])
+              }}
+              style={styles.searchIcon}
+            /> :
+            <Ionicons
+              name="search"
+              size={20}
+              color="#aaa"
+              style={styles.searchIcon}
+            />
         }
       </View>
       <ScrollView>

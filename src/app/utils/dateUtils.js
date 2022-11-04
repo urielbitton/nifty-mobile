@@ -135,6 +135,19 @@ export const getDaysAgo = (date) => {
   return Math.round(msToDays(Date.now()) - msToDays(date))
 }
 
+export const isDateToday = (date) => {
+  const today = new Date()
+  return date?.getDate() === today?.getDate() &&
+    date?.getMonth() === today?.getMonth() &&
+    date?.getFullYear() === today?.getFullYear()
+}
+
+export const isDateLessThanAWeekAgo = (date) => {
+  const today = new Date()
+  const diff = today.getTime() - date.getTime()
+  return diff < 518400000
+}
+
 export const getTimeAgo = (date, fullText) => {
   const seconds = Math.floor((Date.now() - date) / 1000)
   if (seconds < 1)
@@ -155,10 +168,13 @@ export const getTimeTextAgo = (date) => {
   const seconds = Math.floor((Date.now() - date) / 1000)
   if (seconds < 1)
     return 'Just now'
-  else if (seconds < 86400)// less than 24 hours  
+  if (isDateToday(date) && seconds < 86400) {
     return convertClassicTime(date)
-  else
-    return convertClassicDate(date)
+  }
+  if(isDateLessThanAWeekAgo(date)) {
+    return `${getNameDayOfTheWeek(date)} at ${convertClassicTime(date)}`
+  }
+  return convertClassicDate(date)
 }
 
 export const convertAlgoliaDate = (date) => {
@@ -169,8 +185,9 @@ export const convertUnixDate = (date) => {
   return new Date(date * 1000)
 }
 
-export const getNameDayOfTheWeekFromDate = (date) => {
-  return date.toLocaleString('en-CA', { weekday: 'long' })
+export const getNameDayOfTheWeek = (date) => {
+  const dayDate = date.toLocaleString('en-CA', { weekday: 'long' })
+  return dayDate.split(' ')[0]
 }
 
 // accept a start and end date and return an array of dates between them
@@ -185,17 +202,6 @@ export const getDatesBetween = (startDate, endDate) => {
   return dates
 }
 
-//return dates between two dates without the last date
-export const getDatesBetweenExclusive = (startDate, endDate) => {
-  const dates = []
-  const theDate = new Date(startDate)
-  while (theDate < endDate) {
-    dates.push(new Date(theDate))
-    theDate.setDate(theDate.getDate() + 1)
-  }
-  return dates
-}
-
 export const isTimeString1BeforeTimeString2 = (time1, time2) => {
   const [hours1, minutes1] = time1?.split(':')
   const [hours2, minutes2] = time2?.split(':')
@@ -205,10 +211,6 @@ export const isTimeString1BeforeTimeString2 = (time1, time2) => {
     return true
   else
     return false
-}
-
-export const areBothDatesOnSameDay = (date1, date2) => {
-  return date1?.toDateString() === date2?.toDateString()
 }
 
 export const returnLatestDate = (date1, date2) => {
@@ -231,5 +233,3 @@ export const detectNumOfHoursDaysOrWeeks = (date1, date2) => {
     return { string: `${minutes} minutes`, number: minutes }
 
 }
-
-//

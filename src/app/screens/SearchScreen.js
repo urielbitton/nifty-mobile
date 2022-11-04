@@ -53,6 +53,7 @@ export default function SearchScreen() {
   const noResultsFound = searchResults.length < 1 && query.length > 0 && !pageLoading
   const hasMoreResults = query.length > 0 && numOfHits > (pageNum + 1) * hitsPerPage
   const emptySearch = query.length < 1 && searchResults.length < 1
+  const showAll = false
 
   const emptyFilter = 'jobType != 0 AND'
   const jobTypeFilters = jobTypeFilter.length ? `jobType:${jobTypeFilter.join(' OR jobType:')} AND` : emptyFilter
@@ -71,7 +72,8 @@ export default function SearchScreen() {
     setNumOfPages,
     pageNum,
     hitsPerPage,
-    setPageLoading
+    setPageLoading,
+    showAll
   )
 
   const jobTypesOptionsRender = jobTypesOptions.map((option, index) => {

@@ -6,7 +6,7 @@ import { getTimeTextAgo } from "app/utils/dateUtils"
 import React from 'react'
 import { useState } from "react"
 import { useContext } from "react"
-import { View, StyleSheet, Text } from "react-native"
+import { View, StyleSheet, Text, Pressable } from "react-native"
 import AppAvatar from "../ui/AppAvatar"
 
 export default function MessageItem(props) {
@@ -17,15 +17,19 @@ export default function MessageItem(props) {
     senderName } = props.message
   const { chat } = props
   const [showBottom, setShowBottom] = useState(false)
+  const [showTimestamp, setShowTimestamp] = useState(false)
   const isMyMessage = senderID === myUserID
   const userSawCurrentMessage = chat?.seenByDate?.find(seen => seen.userID !== senderID)?.date?.toDate() > messageDate?.toDate()
   const seenUser = useUser(chat?.seenByDate?.find(seen => seen.userID !== senderID)?.userID)
   const isLastMessage = chat?.lastMessageID === messageID
 
   return (
-    <View style={[styles.container, !isCombined && styles.spaceTop]}>
+    <Pressable 
+      style={[styles.container, !isCombined && styles.spaceTop]}
+      onPress={() => setShowTimestamp(prev => !prev)}
+    >
       {
-        hasTimestamp &&
+        (hasTimestamp || showTimestamp) &&
         <View style={styles.top}>
           <Text style={styles.timestamp}>{getTimeTextAgo(messageDate?.toDate())}</Text>
         </View>
@@ -66,7 +70,7 @@ export default function MessageItem(props) {
 
         </View>
       }
-    </View>
+    </Pressable>
   )
 }
 

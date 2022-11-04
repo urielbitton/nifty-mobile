@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react'
 
 export function useInstantSearch(query, searchResults, setSearchResults, indexName, 
-  filters, setNumOfHits, setNumOfPages, page, hitsPerPage, setLoading) {
+  filters, setNumOfHits, setNumOfPages, page, hitsPerPage, setLoading, showAll) {
 
   useEffect(() => {
-    if (query?.length) {
+    if (/\S/.test(query) || showAll) {
       setLoading(true)
       indexName.search(query, {
         filters,

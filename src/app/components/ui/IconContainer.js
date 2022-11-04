@@ -1,17 +1,17 @@
 import React from 'react'
-import { View, StyleSheet, Pressable } from "react-native"
+import { StyleSheet, Pressable } from "react-native"
 
 export default function IconContainer(props) {
 
-  const { dimensions=30, backgroundColor="transparent", IconComponent,
+  const { dimensions=32, backgroundColor="transparent", IconComponent,
     iconColor, iconSize, iconName, borderRadius=30, onPress,
-    style, hasRipple=true, borderlessRipple, rippleColor="#ddd" } = props
+    style, borderlessRipple=true, rippleColor="#ddd" } = props
 
   return (
     <Pressable
       style={[styles.container, style, { width: dimensions, height: dimensions, backgroundColor, borderRadius }]}
       onPress={() => onPress && onPress()}
-      android_ripple={hasRipple ? { color: rippleColor, borderless: borderlessRipple } : {}}
+      android_ripple={{ color: rippleColor, borderless: borderlessRipple }}
     >
       <IconComponent
         name={iconName}
@@ -25,6 +25,7 @@ export default function IconContainer(props) {
 const styles = StyleSheet.create({
   container: {
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    overflow: 'hidden',
   }
 })

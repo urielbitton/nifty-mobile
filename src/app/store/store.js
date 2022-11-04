@@ -11,6 +11,7 @@ const StoreContextProvider = ({children}) => {
   const [myUser, setMyUser] = useState(null) 
   const [loggingAuth, setLoggingAuth] = useState(true)
   const [pageLoading, setPageLoading] = useState(false)
+  const [selectedNewChatUser, setSelectedNewChatUser] = useState(null)
   const myUserID = user?.uid
   const myUserName = `${myUser?.firstName} ${myUser?.lastName}`
   const myUserType = myUser?.userType
@@ -37,7 +38,8 @@ const StoreContextProvider = ({children}) => {
     myInterestedJobIDs, myNotInterestedJobIDs, 
     loggingAuth, setLoggingAuth, 
     pageLoading, setPageLoading,
-    photoURLPlaceholder
+    photoURLPlaceholder,
+    selectedNewChatUser, setSelectedNewChatUser
   }}>
     {children}
   </StoreContext.Provider>
