@@ -1,6 +1,5 @@
 import { AntDesign, Ionicons } from "@expo/vector-icons"
 import { useNavigation } from "@react-navigation/native"
-import ChatConsole from "app/components/chats/ChatConsole"
 import ChatRowItem from "app/components/chats/ChatRowItem"
 import GestureBottomSheet from "app/components/ui/GestureBottomSheet"
 import IconContainer from "app/components/ui/IconContainer"
@@ -11,9 +10,7 @@ import React from 'react'
 import { useContext } from "react"
 import { useRef } from "react"
 import { useState } from "react"
-import {
-  Text, View, StyleSheet, ScrollView,
-  Pressable, TextInput
+import { Text, View, StyleSheet, ScrollView, TextInput
 } from "react-native"
 
 export default function ChatScreen() {

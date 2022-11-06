@@ -19,7 +19,7 @@ const screenHeight = Dimensions.get('window').height
 export default function NewChatScreen() {
 
   const { setPageLoading, selectedNewChatUser,
-    setSelectedNewChatUser } = useContext(StoreContext)
+    setSelectedNewChatUser, myUserID, myUserName } = useContext(StoreContext)
   const [query, setQuery] = useState('')
   const [searchResults, setSearchResults] = useState([])
   const [numOfPages, setNumOfPages] = useState(1)
@@ -31,6 +31,8 @@ export default function NewChatScreen() {
   const [messageText, setMessageText] = useState("")
   const filters = ''
   const showAll = false
+  const chatMembers = [selectedNewChatUser?.userID, myUserID]
+  const searchNames = [`${selectedNewChatUser?.firstName} ${selectedNewChatUser?.lastName}`, myUserName]
 
   const users = useInstantSearch(
     query,
@@ -67,6 +69,10 @@ export default function NewChatScreen() {
       setChatID(getRandomDocID('chats'))
     }
   },[selectedNewChatUser])
+
+  useEffect(() => {
+    return () => setSelectedNewChatUser(null)
+  },[])
 
   return (
     <Screen style={styles.container}>
@@ -108,11 +114,13 @@ export default function NewChatScreen() {
                 chatPath="chats"
                 storagePath={`chats/${chatID}/messages`}
                 chatID={chatID}
+                chatMembers={chatMembers}
+                searchNames={searchNames}
                 messageText={messageText}
                 setMessageText={setMessageText}
                 uploadedImg={null}
                 setUploadedImg={null}
-                scrollRef={null}
+                newChat
               />
             </View>
           </View>

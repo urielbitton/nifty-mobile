@@ -6,18 +6,21 @@ import { StoreContext } from "app/store/store"
 import { getTimeTextAgo } from "app/utils/dateUtils"
 import { truncateText } from "app/utils/generalUtils"
 import AppAvatar from "../ui/AppAvatar"
+import { FontAwesome } from "@expo/vector-icons"
+import { colors } from "app/utils/colors"
 
 export default function ChatRowItem(props) {
 
   const { myUserID } = useContext(StoreContext)
   const { members, lastMessage, lastMessageDate, lastSenderID,
-    seenByDate, chatID } = props.chat
+    notSeenBy, chatID } = props.chat
   const { sheetRef, setChatDetails } = props
-  const otherUserID = members.filter(userID => userID !== myUserID)[0]
+  const otherUserID = members?.filter(userID => userID !== myUserID)[0]
   const otherUser = useUser(otherUserID)
-  const otherUserHasSeen = seenByDate?.find(seen => seen.userID === otherUserID)
-  const myUserHasSeen = seenByDate?.find(seen => seen.userID === myUserID)
+  const otherUserHasSeen = !notSeenBy?.includes(otherUserID)
+  const myUserHasSeen = !notSeenBy?.includes(myUserID)
   const navigation = useNavigation()
+  console.log(!notSeenBy?.includes(otherUserID))
 
   return (
     <Pressable
@@ -39,7 +42,7 @@ export default function ChatRowItem(props) {
         />
         <View style={styles.infoContainer}>
           <Text style={styles.userName}>{otherUser?.firstName} {otherUser?.lastName}</Text>
-          <Text style={[styles.messageText, !myUserHasSeen && styles.unseenMessageText]}>
+          <Text style={[styles.messageText, !myUserHasSeen && lastSenderID !== myUserID && styles.unseenMessageText]}>
             {lastSenderID === myUserID ? 'You: ' : ''}
             {truncateText(lastMessage, 30)}
           </Text>
@@ -53,7 +56,13 @@ export default function ChatRowItem(props) {
             source={{ uri: otherUser?.photoURL }}
             style={styles.seenAvatar}
           /> : 
-          !myUserHasSeen &&
+          !otherUserHasSeen && lastSenderID === myUserID ?
+          <FontAwesome
+            name="check-circle"
+            size={14}
+            color={colors.darkBlueGray}
+          /> :
+          !myUserHasSeen && lastSenderID !== myUserID &&
           <View style={styles.unseenDot} />
         }
       </View>

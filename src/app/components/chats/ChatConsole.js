@@ -2,44 +2,47 @@ import React, { useContext } from 'react'
 import { TextInput, View, StyleSheet } from "react-native"
 import { Ionicons, MaterialIcons } from "@expo/vector-icons"
 import { useChat } from "app/hooks/chatHooks"
-import { createConversation, sendChatMessage } from "app/services/chatsServices"
+import { createConversation, findExistingChat, sendChatMessage } from "app/services/chatsServices"
 import { StoreContext } from "app/store/store"
 import { colors } from "app/utils/colors"
 import * as ImagePicker from 'expo-image-picker'
 import { isDateGreaterThanXTimeAgo, isDateLessThanXTimeAgo } from "app/utils/dateUtils"
 import IconContainer from "../ui/IconContainer"
-import { useEffect } from "react"
+import { useNavigation } from "@react-navigation/native"
 
 export default function ChatConsole(props) {
 
   const { setPageLoading, myUser, myUserID } = useContext(StoreContext)
   const { messageText, setMessageText, uploadedImg, setUploadedImg,
-    messagePath, chatPath, chatID, storagePath, scrollRef } = props
+    chatPath, chatID, storagePath, scrollRef, chatMembers, searchNames,
+    newChat } = props
   const chat = useChat(chatID)
   const isNotEmptyMessage = /\S/.test(messageText)
   const threeMinutes = 1000 * 60 * 3
   const fifteenMinutes = 15 * 60000
+  const navigation = useNavigation()
 
-  const handleSendMessage = () => {
+  const handleSendMessage = (chatID) => {
     if(isNotEmptyMessage) {
+      scrollRef?.current?.scrollToEnd({animated: true})
       setPageLoading(true)
       setMessageText('')
       const combineMessage = isDateLessThanXTimeAgo(chat?.lastMessageDate?.toDate(), threeMinutes) && 
         chat?.lastSenderID === myUserID
       const insertTimestamp = isDateGreaterThanXTimeAgo(chat?.lastMessageDate?.toDate(), fifteenMinutes)
-      sendChatMessage(
+      return sendChatMessage(
         messageText, 
         [uploadedImg], 
-        messagePath, 
+        chatMembers,
+        `chats/${chatID}/messages`, 
         chatPath, 
         chatID, 
         storagePath, 
         myUser, 
         combineMessage, 
-        insertTimestamp
+        insertTimestamp 
       )
       .then(() => {
-        scrollRef.current.scrollToEnd({animated: true})
         setPageLoading(false)
         setMessageText('')
       })
@@ -48,6 +51,30 @@ export default function ChatConsole(props) {
         setPageLoading(false)
       }) 
     }
+  }
+
+  const detectNewOrContinueConversation = () => {
+    findExistingChat('chats', chatMembers)
+    .then((chat) => {
+      if(chat) {
+        handleSendMessage(chat.chatID)
+        .then(() => {
+          navigation.navigate('Conversation', {chat})
+        })
+        .catch(err => console.log(err))
+      }
+      else {
+        createConversation(chatPath, chatMembers, searchNames)
+        .then((chat) => {
+          handleSendMessage(chat.chatID)
+          .then(() => {
+            navigation.navigate('Conversation', {chat})
+          })
+          .catch(err => console.log(err))
+        })
+        .catch(err => console.log(err))
+      }
+    })
   }
 
   const pickImage = async () => {
@@ -93,6 +120,7 @@ export default function ChatConsole(props) {
       <View style={styles.right}>
         <TextInput
           onChangeText={(text) => setMessageText(text)}
+          onFocus={() => scrollRef && scrollRef?.current?.scrollToEnd({animated: true})}
           value={messageText}
           placeholder="Message"
           cursorColor={colors.primary}
@@ -105,7 +133,7 @@ export default function ChatConsole(props) {
           iconColor={colors.primary} 
           iconSize={24} 
           iconName="send-sharp" 
-          onPress={handleSendMessage}
+          onPress={newChat ? detectNewOrContinueConversation : () => handleSendMessage(chatID)}
           style={styles.sendBtn} 
           borderlessRipple
         />

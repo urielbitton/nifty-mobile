@@ -19,14 +19,15 @@ export default function MessageItem(props) {
   const [showBottom, setShowBottom] = useState(false)
   const [showTimestamp, setShowTimestamp] = useState(false)
   const isMyMessage = senderID === myUserID
-  const userSawCurrentMessage = chat?.seenByDate?.find(seen => seen.userID !== senderID)?.date?.toDate() > messageDate?.toDate()
-  const seenUser = useUser(chat?.seenByDate?.find(seen => seen.userID !== senderID)?.userID)
+  const userSawCurrentMessage = !chat?.notSeenBy?.includes(senderID)
+  const seenUser = useUser(chat?.members?.find(user => user !== senderID)?.userID)
   const isLastMessage = chat?.lastMessageID === messageID
 
   return (
     <Pressable 
       style={[styles.container, !isCombined && styles.spaceTop]}
       onPress={() => setShowTimestamp(prev => !prev)}
+      key={messageID}
     >
       {
         (hasTimestamp || showTimestamp) &&
@@ -42,7 +43,7 @@ export default function MessageItem(props) {
             source={senderImg}
             style={styles.avatar}
           /> :
-          userSawCurrentMessage && isLastMessage ?
+          !userSawCurrentMessage && isLastMessage ?
           <AppAvatar
             dimensions={13}
             source={seenUser?.photoURL}
@@ -55,13 +56,10 @@ export default function MessageItem(props) {
           /> :
           <View style={styles.avatarSpacer} />
         }
-        <View style={[
-          styles.bubble, 
-          isMyMessage && styles.myBubble, 
-          isCombined && styles.combinedBottomBubble,
-          isCombined && messageDate === chat?.lastMessageDate && styles.combinedMiddleBubble
-        ]}>
-          <Text style={[styles.messageText, isMyMessage && styles.myMessageText]}>{messageText}</Text>
+        <View style={[styles.bubble, isMyMessage && styles.myBubble]}>
+          <Text style={[styles.messageText, isMyMessage && styles.myMessageText]}>
+            {messageText}
+          </Text>
         </View>
       </View>
       {
@@ -125,14 +123,7 @@ const styles = StyleSheet.create({
   myBubble: {
     backgroundColor: colors.primary,
     marginRight: 5
-  },
-  combinedMiddleBubble: {
-    borderTopLeftRadius: 0,
-    borderBottomLeftRadius: 0,
-  },
-  combinedBottomBubble: {
-    borderTopRightRadius: 3
-  },  
+  }, 
   messageText: {
     fontSize: 16,
     color: '#333',

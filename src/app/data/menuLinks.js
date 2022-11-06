@@ -46,7 +46,7 @@ export const bottomBarLinks = [
     },
     link: 'Messages',
     Component: ChatsScreen,
-    require: 'all'
+    require: 'all',
   },
   {
     name: 'Profile',

@@ -1,7 +1,7 @@
 import { db } from "app/firebase/firebase"
 import { compressImages } from "app/utils/fileUtils"
 import { extractAllLinksFromText } from "app/utils/generalUtils"
-import { getRandomDocID, setDB, updateDB } from "./crudDB"
+import { firebaseArrayRemove, getRandomDocID, setDB, updateDB } from "./crudDB"
 import { uploadMultipleFilesToFireStorage } from "./storageServices"
 
 export const getChatsByUserID = (userID, setChats, limit) => {
@@ -36,9 +36,8 @@ export const getMessagesByChatID = (chatID, setMessages, limit) => {
 
 export const getUnreadChatsByUserID = (userID, setUnreadChats) => {
   db.collection('chats')
-  .where('members', 'array-contains', userID)
-  .where('lastSenderID', '!=', userID)
-  .where('isArchived', '==', false)
+  // .where('members', 'array-contains', userID)
+  .where('notSeenBy', 'array-contains', userID)
   .onSnapshot(snapshot => {
     setUnreadChats(snapshot.docs.map(doc => doc.data()))
   })
@@ -74,7 +73,7 @@ export const getChatLinksByChatID = (path, setChatLinks, limit) => {
     })
 }
 
-export const sendChatMessage = (messageText, uploadedImgFiles, messagePath, chatPath, 
+export const sendChatMessage = (messageText, uploadedImgFiles, chatMembers, messagePath, chatPath, 
   chatID, storagePath, myUser, isCombined, insertTimestamp) => {
   const messageLinks = extractAllLinksFromText(messageText)
   // const uncompressedVideos = uploadedImgFiles?.filter(img => img.file.type.includes('video'))?.map(vid => vid.file)
@@ -129,12 +128,11 @@ export const sendChatMessage = (messageText, uploadedImgFiles, messagePath, chat
           .then(() => {
             return updateDB(chatPath, chatID, {
               lastActive: new Date(),
-              seenByDate: [{userID: myUser?.userID, date: new Date()}],
               lastMessage: messageText,
               lastMessageDate: new Date(),
               lastMessageID: docID,
               lastSenderID: myUser?.userID,
-              isRead: false
+              notSeenBy: chatMembers?.filter(member => member !== myUser?.userID),
             })
           })
           .catch(err => console.log(err))
@@ -164,7 +162,7 @@ export const findExistingChat = (chatPath, usersArray) => {
 
 export const createConversation = (chatPath, members, searchNames) => {
   const docID = getRandomDocID(chatPath)
-  return setDB(chatPath, docID, {
+  const chat = {
     chatID: docID,
     creatorID: members[0],
     dateCreated: new Date(),
@@ -178,10 +176,11 @@ export const createConversation = (chatPath, members, searchNames) => {
     lastSenderID: members[0],
     members,
     searchNames,
-    seenByDate: [{userID: members[0], date: new Date()}],
-  })
+    notSeenBy: members,
+  }
+  return setDB(chatPath, docID, chat)
   .then(() => {
-    return docID
+    return chat
   })
   .catch(err => console.log(err))
 }

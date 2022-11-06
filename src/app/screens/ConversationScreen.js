@@ -1,12 +1,11 @@
 import { Ionicons } from "@expo/vector-icons"
-import { useNavigation } from "@react-navigation/native"
 import ChatConsole from "app/components/chats/ChatConsole"
 import MessageItem from "app/components/chats/MessageItem"
 import AppAvatar from "app/components/ui/AppAvatar"
 import GoBackBtn from "app/components/ui/GoBackBtn"
 import { useChatMessages } from "app/hooks/chatHooks"
 import { useUser } from "app/hooks/userHooks"
-import { firebaseArrayAdd, updateDB } from "app/services/crudDB"
+import { firebaseArrayRemove, updateDB } from "app/services/crudDB"
 import { StoreContext } from "app/store/store"
 import { colors } from "app/utils/colors"
 import { getTimeAgo } from "app/utils/dateUtils"
@@ -14,8 +13,7 @@ import React, { useContext } from 'react'
 import { useEffect } from "react"
 import { useRef } from "react"
 import { useState } from "react"
-import { View, StyleSheet, Text, Pressable, 
-  ScrollView } from "react-native"
+import { View, StyleSheet, Text, ScrollView } from "react-native"
 
 export default function ConversationScreen(props) {
 
@@ -28,7 +26,7 @@ export default function ConversationScreen(props) {
   const otherUserID = chat?.members?.filter(userID => userID !== myUserID)[0]
   const otherUser = useUser(otherUserID)
   const messages = useChatMessages(chat?.chatID, messagesLimit)
-  const myUserHasSeen = chat?.seenByDate?.find(seen => seen.userID === myUserID)
+  const myUserHasSeen = !chat?.notSeenBy?.includes(myUserID)
   const scrollRef = useRef(null)
 
   const messagesList = messages?.map((message, index) => {
@@ -42,10 +40,7 @@ export default function ConversationScreen(props) {
   useEffect(() => {
     if(!myUserHasSeen) {
       updateDB('chats', chat?.chatID, {
-        seenByDate: firebaseArrayAdd({
-          userID: myUserID,
-          date: new Date()
-        })
+        notSeenBy: firebaseArrayRemove(myUserID)
       })
     }
   },[myUserHasSeen])
@@ -80,15 +75,15 @@ export default function ConversationScreen(props) {
       <ScrollView 
         contentContainerStyle={styles.messagesList}
         ref={scrollRef}
-        onScroll={(e) => e.nativeEvent.contentOffset.y === 0 && setMessagesLimit(messagesLimit + limitsNum)}
+        onScroll={(e) => e.nativeEvent.contentOffset.y <= 5 && setMessagesLimit(messagesLimit + limitsNum)}
       >
         {messagesList}
       </ScrollView>
       <ChatConsole
-        messagePath={`chats/${chat?.chatID}/messages`}
         chatPath="chats"
         storagePath={`chats/${chat?.chatID}/messages`}
         chatID={chat?.chatID}
+        chatMembers={chat?.members}
         messageText={messageText}
         setMessageText={setMessageText}
         uploadedImg={uploadedImg}
@@ -151,6 +146,6 @@ const styles = StyleSheet.create({
   messagesList: {
     padding: 10,
     flexDirection: 'column-reverse',
-    justifyContent: 'flex-end',
+    // justifyContent: 'flex-end',
   }
 })

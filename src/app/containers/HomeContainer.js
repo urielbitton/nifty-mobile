@@ -4,18 +4,22 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { bottomBarLinks } from "../data/menuLinks"
 import { colors } from "../utils/colors"
 import { StoreContext } from "app/store/store"
+import { useUnreadChats } from "app/hooks/chatHooks"
 
 const Tab = createBottomTabNavigator()
 
 export default function HomeContainer() {
 
-  const { myUserType } = useContext(StoreContext)
+  const { myUserType, myUserID } = useContext(StoreContext)
+  const unreadChats = useUnreadChats(myUserID)
 
   const tabsBarRender = bottomBarLinks
     ?.filter(tab => tab.require.includes(myUserType) || tab.require.includes('all'))
     .map((tab, i) => {
       return <Tab.Screen
         options={{
+          tabBarBadge: tab.name === 'Messages' ? unreadChats?.length > 0 ? unreadChats.length : null : null,
+          tabBarBadgeStyle: { backgroundColor: colors.primary },
           tabBarIcon: ({ focused }) =>
             <tab.icon.component
               style={{ top: -3 }}
