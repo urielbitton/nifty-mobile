@@ -29,7 +29,6 @@ export default function ConversationScreen(props) {
   const otherUser = useUser(otherUserID)
   const messages = useChatMessages(chat?.chatID, messagesLimit)
   const myUserHasSeen = chat?.seenByDate?.find(seen => seen.userID === myUserID)
-  const navigation = useNavigation()
   const scrollRef = useRef(null)
 
   const messagesList = messages?.map((message, index) => {
