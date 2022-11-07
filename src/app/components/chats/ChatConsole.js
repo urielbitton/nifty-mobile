@@ -7,6 +7,7 @@ import { createConversation, findExistingChat,
 import { StoreContext } from "app/store/store"
 import { colors } from "app/utils/colors"
 import * as ImagePicker from 'expo-image-picker'
+import * as MediaLibrary from 'expo-media-library'
 import { isDateGreaterThanXTimeAgo, isDateLessThanXTimeAgo } from "app/utils/dateUtils"
 import IconContainer from "../ui/IconContainer"
 import { useNavigation } from "@react-navigation/native"
@@ -16,10 +17,11 @@ import { useState } from "react"
 export default function ChatConsole(props) {
 
   const { setPageLoading, myUser, myUserID } = useContext(StoreContext)
-  const { messageText, setMessageText, uploadedImg, setUploadedImg,
+  const { messageText, setMessageText, setUploadedImg, setPhotoLibrary,
     chatPath, chatID, storagePath, scrollRef, chatMembers, searchNames,
-    newChat, handleInputFocus, handleInputBlur } = props
+    newChat, handleInputFocus, handleInputBlur, photosSheetRef } = props
   const [imageBlob, setImageBlob] = useState(null)
+  const [status, requestPermission] = MediaLibrary.usePermissions()
   const chat = useChat(chatID)
   const isNotEmptyMessage = /\S/.test(messageText)
   const threeMinutes = 1000 * 60 * 3
@@ -83,23 +85,25 @@ export default function ChatConsole(props) {
   }
 
   const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: false,
-      aspect: [4, 3],
-      quality: 0.6,
+    requestPermission()
+    .then(() => {
+      if(status.granted) {
+        photosSheetRef?.current?.snapToPosition('50%')
+        MediaLibrary.getAlbumAsync('Camera') 
+        .then((album) => {
+          if(album) {
+            MediaLibrary.getAssetsAsync({sortBy: [MediaLibrary.SortBy.creationTime]})
+            .then(assets => {
+              if(assets) {
+                setPhotoLibrary(assets.assets)
+              }
+            })
+          }
+        })
+      }
     })
-    if (!result.cancelled) {
-      setUploadedImg(result)
-      uploadImageToBlob(result.uri)
-      .then((blob) => {
-        console.log(blob)
-        setImageBlob(blob)
-      })
-      .catch(err => console.log(err))
-    }
   }
-
+  
   const launchCamera = async () => {
     
   }

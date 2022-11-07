@@ -14,10 +14,12 @@
     "plugins": [
       [
         "expo-image-picker",
+        "expo-media-library",
         {
-          "photosPermission": "The app accesses your photos to let you share them on Nifty.",
-          "cameraPermission": "The app accesses your camera to let you take photos and videos to share on Nifty.",
-          "cameraRollPermission": "The app accesses your camera roll to let you share photos and videos on Nifty."
+          "photosPermission": "Allow Nifty to access your photos",
+          "cameraPermission": "Allow Nifty to access your camera.",
+          "cameraRollPermission": "Allow Nift to access your camera roll.",
+          "savePhotosPermission": "Allow Nifty to save photos."
         }
       ]
     ],

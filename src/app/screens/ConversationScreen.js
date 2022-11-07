@@ -1,7 +1,11 @@
+import React, { useState, useRef, useEffect, useContext } from "react"
+import { View, StyleSheet, Text, ScrollView, 
+  Image } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import ChatConsole from "app/components/chats/ChatConsole"
 import MessageItem from "app/components/chats/MessageItem"
 import AppAvatar from "app/components/ui/AppAvatar"
+import AppBottomSheet from "app/components/ui/AppBottomSheet"
 import ChatTypingAnimate from "app/components/ui/ChatTypingAnimate"
 import GoBackBtn from "app/components/ui/GoBackBtn"
 import IconContainer from "app/components/ui/IconContainer"
@@ -12,11 +16,6 @@ import { firebaseArrayRemove, updateDB } from "app/services/crudDB"
 import { StoreContext } from "app/store/store"
 import { colors } from "app/utils/colors"
 import { getTimeAgo } from "app/utils/dateUtils"
-import React, { useContext } from 'react'
-import { useEffect } from "react"
-import { useRef } from "react"
-import { useState } from "react"
-import { View, StyleSheet, Text, ScrollView } from "react-native"
 
 export default function ConversationScreen(props) {
 
@@ -26,6 +25,7 @@ export default function ConversationScreen(props) {
   const limitsNum = 15
   const [messageText, setMessageText] = useState("")
   const [uploadedImg, setUploadedImg] = useState(null)
+  const [photoLibrary, setPhotoLibrary] = useState(null)
   const [messagesLimit, setMessagesLimit] = useState(limitsNum)
   const [inputFocused, setInputFocused] = useState(false)
   const otherUserID = chat?.members?.filter(userID => userID !== myUserID)[0]
@@ -33,12 +33,21 @@ export default function ConversationScreen(props) {
   const messages = useChatMessages(chatID, messagesLimit)
   const myUserHasSeen = !chat?.notSeenBy?.includes(myUserID)
   const scrollRef = useRef(null)
+  const photosSheetRef = useRef(null)
 
   const messagesList = messages?.map((message, index) => {
     return <MessageItem
       key={index}
       message={message}
       chat={chat}
+    />
+  })
+
+  const photoLibraryList = photoLibrary?.map((photo, index) => {
+    return <Image
+      key={index}
+      source={{uri: photo.uri}}
+      style={styles.photoLibraryImg}
     />
   })
 
@@ -123,12 +132,23 @@ export default function ConversationScreen(props) {
         chatMembers={chat?.members}
         messageText={messageText}
         setMessageText={setMessageText}
-        uploadedImg={uploadedImg}
         setUploadedImg={setUploadedImg}
+        setPhotoLibrary={setPhotoLibrary}
         scrollRef={scrollRef}
         handleInputFocus={handleInputFocus}
         handleInputBlur={handleInputBlur}
+        photosSheetRef={photosSheetRef}
       />
+      <AppBottomSheet
+        sheetRef={photosSheetRef}
+      >
+        <View>
+          <Text>Camera Roll</Text>
+        </View>
+        <View style={styles.photosLibrary}>
+          {photoLibraryList}
+        </View>
+      </AppBottomSheet>
     </View>
   )
 }
@@ -206,4 +226,17 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginTop: 10,
   },
+  photosLibrary: {
+    marginTop: 20,
+    flex: 4,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  photoLibraryImg: {
+    width: 120,
+    height: 120,
+    borderRadius: 0,
+    borderWidth: 1,
+    borderColor: '#fff',
+  }
 })

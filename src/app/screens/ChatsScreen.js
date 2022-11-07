@@ -1,7 +1,7 @@
 import { AntDesign, Ionicons } from "@expo/vector-icons"
 import { useNavigation } from "@react-navigation/native"
 import ChatRowItem from "app/components/chats/ChatRowItem"
-import GestureBottomSheet from "app/components/ui/GestureBottomSheet"
+import AppBottomSheet from "app/components/ui/AppBottomSheet"
 import IconContainer from "app/components/ui/IconContainer"
 import { useChats } from "app/hooks/chatHooks"
 import { StoreContext } from "app/store/store"
@@ -27,6 +27,7 @@ export default function ChatScreen() {
   const [messageText, setMessageText] = useState('')
   const [chatsLimit, setChatsLimit] = useState(10)
   const [chatDetails, setChatDetails] = useState(null)
+  const [showBottomSheet, setShowBottomSheet] = useState(false)
   const chats = useChats(myUserID, chatsLimit)
   const navigation = useNavigation()
   const sheetRef = useRef(null)
@@ -91,12 +92,11 @@ export default function ChatScreen() {
           {chatsList}
         </View>
       </ScrollView>
-      <GestureBottomSheet
-        height={600}
+      <AppBottomSheet
         sheetRef={sheetRef}
       >
         <Text>Chat ID: {chatDetails?.chatID}</Text>
-      </GestureBottomSheet>
+      </AppBottomSheet>
     </View>
   )
 }

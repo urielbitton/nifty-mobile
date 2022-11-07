@@ -16,7 +16,7 @@ import MultiSlider from "@ptomasroos/react-native-multi-slider"
 import { jobEnvironmentOptions, jobTypesOptions,
   sortByOptions } from "app/data/searchFiltersData"
 import { useRef } from "react"
-import GestureBottomSheet from "app/components/ui/GestureBottomSheet"
+import AppBottomSheet from "app/components/ui/AppBottomSheet"
 import AppCheckbox from "app/components/ui/AppCheckbox"
 import { useEffect } from "react"
 import JobCard from "app/components/jobs/JobCard"
@@ -255,7 +255,7 @@ export default function SearchScreen() {
               containerStyle={styles.filterBtnContainer}
               titleStyle={styles.filterBtnText}
               buttonStyle={styles.filterBtn}
-              onPress={() => filtersSheetRef.current.show()}
+              onPress={() => filtersSheetRef.current.expand()}
             />
             <Button
               title="Sort"
@@ -270,7 +270,7 @@ export default function SearchScreen() {
               containerStyle={styles.filterBtnContainer}
               buttonStyle={styles.filterBtn}
               titleStyle={styles.filterBtnText}
-              onPress={() => sortSheetRef.current.show()}
+              onPress={() => sortSheetRef.current.expand()}
             />
           </View>
         </View>
@@ -314,9 +314,9 @@ export default function SearchScreen() {
           </View>
         }
       </ScrollView>
-      <GestureBottomSheet
-        height={screenHeight - 100}
+      <AppBottomSheet
         sheetRef={filtersSheetRef}
+        snapPoints={['50%', '100%']}
       >
         <View style={styles.filtersContainer}>
           <Text style={styles.filterTitle}>Filters</Text>
@@ -394,9 +394,8 @@ export default function SearchScreen() {
             buttonStyle={styles.applyFiltersBtn}
           />
         </View>
-      </GestureBottomSheet>
-      <GestureBottomSheet
-        height={500}
+      </AppBottomSheet>
+      <AppBottomSheet
         sheetRef={sortSheetRef}
       >
         <View style={styles.filtersContainer}>
@@ -438,7 +437,7 @@ export default function SearchScreen() {
             buttonStyle={styles.applyFiltersBtn}
           />
         </View>
-      </GestureBottomSheet>
+      </AppBottomSheet>
     </View>
   )
 }

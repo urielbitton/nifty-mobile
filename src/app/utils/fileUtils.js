@@ -1,5 +1,5 @@
-export const uploadImageToBlob = (uri) => {
-  return new Promise((resolve, reject) => {
+export const uploadImageToBlob = async (uri) => {
+  const blob = await new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest()
     xhr.onload = function() {
       resolve(xhr.response)
@@ -12,6 +12,7 @@ export const uploadImageToBlob = (uri) => {
     xhr.open('GET', uri, true)
     xhr.send(null)
   })
+  return blob
 }
 
 export const fileTypeConverter = (string) => {
