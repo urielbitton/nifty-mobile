@@ -118,30 +118,8 @@ export const detectAndUnderlineAllLinksInText = (text) => {
   return newText
 } 
 
-export const isElementInView = (el) => {
-  let rect = el.getBoundingClientRect()
-  return rect.bottom > 0 && rect.top < (window.innerHeight || document.documentElement.clientHeight + 300) 
-}
-
 export const isNumbersInRange = (number1, number2, range) => {
   return Math.abs(number1 - number2) <= range
-}
-
-export const getMemberNickname = (userID, members) => {
-  return members?.find(member => member.userID === userID)?.nickname
-}
-
-export const toggleFullScreen = () => {
-  const elem = document.documentElement
-  if (elem.requestFullscreen) {
-    elem.requestFullscreen()
-  } else if (elem.mozRequestFullScreen) { 
-    elem.mozRequestFullScreen()
-  } else if (elem.webkitRequestFullscreen) { 
-    elem.webkitRequestFullscreen()
-  } else if (elem.msRequestFullscreen) { 
-    elem.msRequestFullscreen()
-  }
 }
 
 export const convertMetersPerSecondToKmPerHour = (metersPerSecond) => {

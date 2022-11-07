@@ -1,6 +1,18 @@
-import Compressor from 'compressorjs';
-
-function setLoadingDef(num) {}
+export const uploadImageToBlob = (uri) => {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest()
+    xhr.onload = function() {
+      resolve(xhr.response)
+    }
+    xhr.onerror = function(e) {
+      console.log(e)
+      reject(new TypeError('Network request failed'))
+    }
+    xhr.responseType = 'blob'
+    xhr.open('GET', uri, true)
+    xhr.send(null)
+  })
+}
 
 export const fileTypeConverter = (string) => {
   if(string?.includes('wordprocessingml')) 
@@ -42,53 +54,6 @@ export const fileTypePathConverter = (string) => {
     return 'other'
 }
 
-export const uploadMultipleFilesLocal = (e, maxSize, setFiles, ref, setLoading=setLoadingDef) => {
-  setLoading(true)
-  let files = e.target.files
-  for(let i = 0; i < files.length; i++) {
-    if(files[i].size > maxSize) {
-      setLoading(false)
-      return alert(`One or more of the uploaded files are too large. Max file size is ${maxSize/1000000} MB`)
-    }
-  }
-  
-  let filesArray = []
-  if(files) {
-    for(let i = 0; i < files.length; i++) {
-      filesArray.push(files[i])
-    }
-  }
-  return Promise.all(filesArray.map(file => {
-    return new Promise((resolve, reject) => {
-      let reader = new FileReader()
-      reader.onloadend = function() {
-        setLoading(false)
-        resolve({img: reader.result, file})
-      } 
-      if(file) {
-        reader.readAsDataURL(file)
-      } 
-    })
-  }))
-  .then((files) => {
-    setLoading(false)
-    if(files) {
-      if(files.length > 1)
-        setFiles(prev => [...prev, ...files])
-      else 
-        setFiles(prev => [...prev, files[0]])
-    }
-  })
-  .catch(err => {
-    setLoading(false)
-    console.log(err)
-  })
-}
-
-export const isFileTypeImage = (file) => {
-  return file?.type?.includes('image')
-}
-
 export const convertBytesToKbMbGb = (bytes, toFixedNum=2) => {
   if(bytes < 1024) {
     return bytes + ' B'
@@ -102,56 +67,4 @@ export const convertBytesToKbMbGb = (bytes, toFixedNum=2) => {
   else {
     return (bytes/1073741824).toFixed(toFixedNum) + ' GB'
   }
-}
-
-export const getSizeOfAllFiles = (files) => {
-  let totalSize = 0
-  files.forEach(file => {
-    totalSize += file.fileSize
-  })
-  return totalSize
-}
-
-export async function downloadUsingFetch(fileURL, fileName) {
-  const res = await fetch(fileURL)
-  const blob = await res.blob()
-  const url = window.URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = fileName
-  a.click()
-  window.URL.revokeObjectURL(url)
-}
-
-export async function downloadUsingFetchFromFile(file, fileName) {
-  const url = window.URL.createObjectURL(file)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = fileName
-  a.click()
-  window.URL.revokeObjectURL(url)
-}
-
-export const compressImages = (files, quality=0.4) => {
-  if(!files.length) {
-    return Promise.resolve([])
-  }
-  return Promise.all(
-    files
-    .filter(file => file?.type && file?.type?.includes('image'))
-    .map((image) => {
-      return new Promise((resolve) => {
-        new Compressor(image, {
-          quality,
-          success(result) {
-            console.log(result)
-            resolve(result)
-          },
-          error(err) {
-            console.log(err.message)
-          }
-        })
-      })
-    })
-  )
 }

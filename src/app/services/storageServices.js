@@ -6,7 +6,7 @@ export const uploadMultipleFilesToFireStorage = (files, storagePath, setUploadPr
     const imgURLs = []
     files.forEach((file, i) => {
       const storageRef = storage.ref(storagePath)
-      const uploadTask = storageRef.child(file.name).put(file)
+      const uploadTask = storageRef.child('chat-imgs').put(file)
       uploadTask.on('state_changed', (snapshot) => {
         const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
         setUploadProgress && setUploadProgress(progress)

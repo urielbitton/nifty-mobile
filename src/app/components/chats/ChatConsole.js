@@ -2,20 +2,24 @@ import React, { useContext } from 'react'
 import { TextInput, View, StyleSheet } from "react-native"
 import { Ionicons, MaterialIcons } from "@expo/vector-icons"
 import { useChat } from "app/hooks/chatHooks"
-import { createConversation, findExistingChat, sendChatMessage } from "app/services/chatsServices"
+import { createConversation, findExistingChat, 
+  sendChatMessage, updateIsTypingChat } from "app/services/chatsServices"
 import { StoreContext } from "app/store/store"
 import { colors } from "app/utils/colors"
 import * as ImagePicker from 'expo-image-picker'
 import { isDateGreaterThanXTimeAgo, isDateLessThanXTimeAgo } from "app/utils/dateUtils"
 import IconContainer from "../ui/IconContainer"
 import { useNavigation } from "@react-navigation/native"
+import { uploadImageToBlob } from "app/utils/fileUtils"
+import { useState } from "react"
 
 export default function ChatConsole(props) {
 
   const { setPageLoading, myUser, myUserID } = useContext(StoreContext)
   const { messageText, setMessageText, uploadedImg, setUploadedImg,
     chatPath, chatID, storagePath, scrollRef, chatMembers, searchNames,
-    newChat } = props
+    newChat, handleInputFocus, handleInputBlur } = props
+  const [imageBlob, setImageBlob] = useState(null)
   const chat = useChat(chatID)
   const isNotEmptyMessage = /\S/.test(messageText)
   const threeMinutes = 1000 * 60 * 3
@@ -25,6 +29,7 @@ export default function ChatConsole(props) {
   const handleSendMessage = (chatID) => {
     if(isNotEmptyMessage) {
       scrollRef?.current?.scrollToEnd({animated: true})
+      updateIsTypingChat(chatID, myUserID, false)
       setPageLoading(true)
       setMessageText('')
       const combineMessage = isDateLessThanXTimeAgo(chat?.lastMessageDate?.toDate(), threeMinutes) && 
@@ -32,7 +37,7 @@ export default function ChatConsole(props) {
       const insertTimestamp = isDateGreaterThanXTimeAgo(chat?.lastMessageDate?.toDate(), fifteenMinutes)
       return sendChatMessage(
         messageText, 
-        [uploadedImg], 
+        [imageBlob], 
         chatMembers,
         `chats/${chatID}/messages`, 
         chatPath, 
@@ -80,12 +85,18 @@ export default function ChatConsole(props) {
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
+      allowsEditing: false,
       aspect: [4, 3],
-      quality: 1,
+      quality: 0.6,
     })
     if (!result.cancelled) {
-      setUploadedImg(result.uri)
+      setUploadedImg(result)
+      uploadImageToBlob(result.uri)
+      .then((blob) => {
+        console.log(blob)
+        setImageBlob(blob)
+      })
+      .catch(err => console.log(err))
     }
   }
 
@@ -120,7 +131,8 @@ export default function ChatConsole(props) {
       <View style={styles.right}>
         <TextInput
           onChangeText={(text) => setMessageText(text)}
-          onFocus={() => scrollRef && scrollRef?.current?.scrollToEnd({animated: true})}
+          onFocus={handleInputFocus}
+          onBlur={handleInputBlur}
           value={messageText}
           placeholder="Message"
           cursorColor={colors.primary}

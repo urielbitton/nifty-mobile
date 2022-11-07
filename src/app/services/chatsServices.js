@@ -1,7 +1,7 @@
 import { db } from "app/firebase/firebase"
 import { compressImages } from "app/utils/fileUtils"
 import { extractAllLinksFromText } from "app/utils/generalUtils"
-import { firebaseArrayRemove, getRandomDocID, setDB, updateDB } from "./crudDB"
+import { getRandomDocID, setDB, updateDB } from "./crudDB"
 import { uploadMultipleFilesToFireStorage } from "./storageServices"
 
 export const getChatsByUserID = (userID, setChats, limit) => {
@@ -25,22 +25,22 @@ export const getChatByID = (chatID, setChat) => {
 
 export const getMessagesByChatID = (chatID, setMessages, limit) => {
   db.collection('chats')
-  .doc(chatID)
-  .collection('messages')
-  .orderBy('messageDate', 'desc')
-  .limit(limit)
-  .onSnapshot(snapshot => {
-    setMessages(snapshot.docs.map(doc => doc.data()))
-  })
+    .doc(chatID)
+    .collection('messages')
+    .orderBy('messageDate', 'desc')
+    .limit(limit)
+    .onSnapshot(snapshot => {
+      setMessages(snapshot.docs.map(doc => doc.data()))
+    })
 }
 
 export const getUnreadChatsByUserID = (userID, setUnreadChats) => {
   db.collection('chats')
-  // .where('members', 'array-contains', userID)
-  .where('notSeenBy', 'array-contains', userID)
-  .onSnapshot(snapshot => {
-    setUnreadChats(snapshot.docs.map(doc => doc.data()))
-  })
+    // .where('members', 'array-contains', userID)
+    .where('notSeenBy', 'array-contains', userID)
+    .onSnapshot(snapshot => {
+      setUnreadChats(snapshot.docs.map(doc => doc.data()))
+    })
 }
 
 export const getChatMediasByChatID = (path, setChatMedias, limit) => {
@@ -73,91 +73,74 @@ export const getChatLinksByChatID = (path, setChatLinks, limit) => {
     })
 }
 
-export const sendChatMessage = (messageText, uploadedImgFiles, chatMembers, messagePath, chatPath, 
+export const sendChatMessage = (messageText, uploadedImgFiles, chatMembers, messagePath, chatPath,
   chatID, storagePath, myUser, isCombined, insertTimestamp) => {
   const messageLinks = extractAllLinksFromText(messageText)
-  // const uncompressedVideos = uploadedImgFiles?.filter(img => img.file.type.includes('video'))?.map(vid => vid.file)
-  const uncompressedVideos = []
-  return compressImages(uploadedImgFiles)
-    .then(compressedImgs => {
-      return uploadMultipleFilesToFireStorage([...compressedImgs, ...uncompressedVideos], storagePath)
-        .then(imgURLs => {
-          const docID = getRandomDocID(messagePath)
-          return setDB(messagePath, docID, {
-            isDeleted: false,
-            isEdited: false,
-            isCombined,
-            messageDate: new Date(),
-            messageID: docID,
-            messageText,
-            senderID: myUser.userID,
-            senderName: `${myUser.firstName} ${myUser.lastName}`,
-            senderImg: myUser.photoURL,
-            hasTimestamp: insertTimestamp,
-            hasLinks: messageLinks?.length > 0,
-            ...(messageLinks?.length > 0 && { links: messageLinks }),
-            ...(imgURLs.length && {
-              hasImgs: imgURLs.some(img => img.file.type.includes('image') || img.file.type.includes('video')) ? true : false,
-              hasFiles: imgURLs.some(img => img.file.type.includes('application') || img.file.type.includes('text')) ? true : false,
-              chatImgs: [
-                ...imgURLs
-                  .filter(imgURL => imgURL.file.type.includes('image') || imgURL.file.type.includes('video'))
-                  .map((imgURL, i) => {
-                    return {
-                      imgURL: imgURL.downloadURL,
-                      imgID: `${docID}_${i}`,
-                      name: imgURL.file.name,
-                      type: imgURL.file.type.includes('video') ? 'video' : 'image'
-                    }
-                  })
-              ],
-              files: [
-                ...imgURLs
-                  .filter(fileURL => !fileURL.file.type.includes('image') && !fileURL.file.type.includes('video'))
-                  .map((fileURL, i) => {
-                    return {
-                      fileURL: fileURL.downloadURL,
-                      fileName: fileURL.file.name,
-                      fileSize: fileURL.file.size,
-                      fileType: fileURL.file.type
-                    }
-                  })
-              ],
-            })
+  return uploadMultipleFilesToFireStorage(uploadedImgFiles, storagePath)
+    .then(imgURLs => {
+      const docID = getRandomDocID(messagePath)
+      return setDB(messagePath, docID, {
+        isDeleted: false,
+        isEdited: false,
+        isCombined,
+        messageDate: new Date(),
+        messageID: docID,
+        messageText,
+        senderID: myUser.userID,
+        senderName: `${myUser.firstName} ${myUser.lastName}`,
+        senderImg: myUser.photoURL,
+        hasTimestamp: insertTimestamp,
+        hasLinks: messageLinks?.length > 0,
+        ...(messageLinks?.length > 0 && { links: messageLinks }),
+        ...(imgURLs.length && {
+          hasImgs: imgURLs.length,
+          hasFiles: imgURLs.length,
+          chatImgs: [
+            ...imgURLs
+              .map((imgURL, i) => {
+                return {
+                  imgURL: imgURL.downloadURL,
+                  imgID: `${docID}_${i}`,
+                  name: '',
+                  type: ''
+                }
+              })
+          ],
+          files: [],
+        })
+      })
+        .then(() => {
+          return updateDB(chatPath, chatID, {
+            lastActive: new Date(),
+            lastMessage: messageText,
+            lastMessageDate: new Date(),
+            lastMessageID: docID,
+            lastSenderID: myUser?.userID,
+            notSeenBy: chatMembers?.filter(member => member !== myUser?.userID),
           })
-          .then(() => {
-            return updateDB(chatPath, chatID, {
-              lastActive: new Date(),
-              lastMessage: messageText,
-              lastMessageDate: new Date(),
-              lastMessageID: docID,
-              lastSenderID: myUser?.userID,
-              notSeenBy: chatMembers?.filter(member => member !== myUser?.userID),
-            })
-          })
-          .catch(err => console.log(err))
         })
         .catch(err => console.log(err))
     })
+    .catch(err => console.log(err))
 }
 
 export const findExistingChat = (chatPath, usersArray) => {
   return db.collection(chatPath)
-  .where('members', '==', usersArray)
-  .get()
-  .then(snapshot => snapshot.empty ? null : snapshot.docs[0].data())
-  .then((chat) => {
-    if(chat) {
-      return chat
-    }
-    else {
-      return db.collection(chatPath)
-      .where('members', '==', usersArray.reverse())
-      .get()
-      .then(snapshot => snapshot.empty ? null : snapshot.docs[0].data())
-    }
-  })
-  .catch(err => console.log(err))
+    .where('members', '==', usersArray)
+    .get()
+    .then(snapshot => snapshot.empty ? null : snapshot.docs[0].data())
+    .then((chat) => {
+      if (chat) {
+        return chat
+      }
+      else {
+        return db.collection(chatPath)
+          .where('members', '==', usersArray.reverse())
+          .get()
+          .then(snapshot => snapshot.empty ? null : snapshot.docs[0].data())
+      }
+    })
+    .catch(err => console.log(err))
 }
 
 export const createConversation = (chatPath, members, searchNames) => {
@@ -179,8 +162,14 @@ export const createConversation = (chatPath, members, searchNames) => {
     notSeenBy: members,
   }
   return setDB(chatPath, docID, chat)
-  .then(() => {
-    return chat
+    .then(() => {
+      return chat
+    })
+    .catch(err => console.log(err))
+}
+
+export const updateIsTypingChat = (chatID, userID, isTyping) => {
+  updateDB('chats', chatID, {
+    userTyping: isTyping ? [userID] : []
   })
-  .catch(err => console.log(err))
 }

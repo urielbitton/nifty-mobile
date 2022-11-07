@@ -2,9 +2,12 @@ import { Ionicons } from "@expo/vector-icons"
 import ChatConsole from "app/components/chats/ChatConsole"
 import MessageItem from "app/components/chats/MessageItem"
 import AppAvatar from "app/components/ui/AppAvatar"
+import ChatTypingAnimate from "app/components/ui/ChatTypingAnimate"
 import GoBackBtn from "app/components/ui/GoBackBtn"
-import { useChatMessages } from "app/hooks/chatHooks"
+import IconContainer from "app/components/ui/IconContainer"
+import { useChat, useChatMessages } from "app/hooks/chatHooks"
 import { useUser } from "app/hooks/userHooks"
+import { updateIsTypingChat } from "app/services/chatsServices"
 import { firebaseArrayRemove, updateDB } from "app/services/crudDB"
 import { StoreContext } from "app/store/store"
 import { colors } from "app/utils/colors"
@@ -18,14 +21,16 @@ import { View, StyleSheet, Text, ScrollView } from "react-native"
 export default function ConversationScreen(props) {
 
   const { myUserID } = useContext(StoreContext)
-  const { chat } = props.route.params
+  const { chatID } = props.route.params
+  const chat = useChat(chatID)
   const limitsNum = 15
   const [messageText, setMessageText] = useState("")
   const [uploadedImg, setUploadedImg] = useState(null)
   const [messagesLimit, setMessagesLimit] = useState(limitsNum)
+  const [inputFocused, setInputFocused] = useState(false)
   const otherUserID = chat?.members?.filter(userID => userID !== myUserID)[0]
   const otherUser = useUser(otherUserID)
-  const messages = useChatMessages(chat?.chatID, messagesLimit)
+  const messages = useChatMessages(chatID, messagesLimit)
   const myUserHasSeen = !chat?.notSeenBy?.includes(myUserID)
   const scrollRef = useRef(null)
 
@@ -37,13 +42,38 @@ export default function ConversationScreen(props) {
     />
   })
 
+  const handleInputFocus = () => {
+    if(scrollRef) {
+      scrollRef?.current?.scrollToEnd({animated: true})
+    }
+    setInputFocused(true)
+  }
+
+  const handleInputBlur = () => {
+    updateIsTypingChat(chatID, myUserID, false)
+    setInputFocused(false)
+  }
+
   useEffect(() => {
     if(!myUserHasSeen) {
-      updateDB('chats', chat?.chatID, {
+      updateDB('chats', chatID, {
         notSeenBy: firebaseArrayRemove(myUserID)
       })
     }
   },[myUserHasSeen])
+
+  useEffect(() => {
+    let timer = null
+    if(inputFocused) {
+      if(messageText.length) {
+        updateIsTypingChat(chatID, myUserID, true)
+      }
+      timer = setTimeout(() => {
+        updateIsTypingChat(chatID, myUserID, false)
+      }, 5000)
+    }
+    return () => clearTimeout(timer)
+  },[inputFocused, messageText])
 
   return (
     <View style={styles.container}>
@@ -65,11 +95,14 @@ export default function ConversationScreen(props) {
           </View>
         </View>
         <View style={styles.headerRight}>
-          <Ionicons 
-            name="information-circle-sharp" 
-            size={24} 
-            color={colors.primary}
-          />
+          <IconContainer
+            dimensions={30}
+            rippleColor="#ddd"
+            IconComponent={Ionicons}
+            iconName="information-circle-sharp"
+            iconColor={colors.primary}
+            iconSize={24}
+          />  
         </View>
       </View>
       <ScrollView 
@@ -77,18 +110,24 @@ export default function ConversationScreen(props) {
         ref={scrollRef}
         onScroll={(e) => e.nativeEvent.contentOffset.y <= 5 && setMessagesLimit(messagesLimit + limitsNum)}
       >
+        { 
+          chat?.userTyping?.includes(otherUserID) && 
+          <ChatTypingAnimate style={styles.typingAnimate} /> 
+        }
         {messagesList}
       </ScrollView>
       <ChatConsole
         chatPath="chats"
-        storagePath={`chats/${chat?.chatID}/messages`}
-        chatID={chat?.chatID}
+        storagePath={`chats/${chatID}/messages`}
+        chatID={chatID}
         chatMembers={chat?.members}
         messageText={messageText}
         setMessageText={setMessageText}
         uploadedImg={uploadedImg}
         setUploadedImg={setUploadedImg}
         scrollRef={scrollRef}
+        handleInputFocus={handleInputFocus}
+        handleInputBlur={handleInputBlur}
       />
     </View>
   )
@@ -146,6 +185,25 @@ const styles = StyleSheet.create({
   messagesList: {
     padding: 10,
     flexDirection: 'column-reverse',
-    // justifyContent: 'flex-end',
-  }
+  }, 
+  typingAnimate: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    width: 60,
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    backgroundColor: "#fff",
+    borderRadius: 30,
+    shadowColor: '#aaa',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0,
+    shadowRadius: 5,
+    elevation: 5,
+    marginLeft: 10,
+    marginTop: 10,
+  },
 })

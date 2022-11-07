@@ -8,26 +8,26 @@ import { truncateText } from "app/utils/generalUtils"
 import AppAvatar from "../ui/AppAvatar"
 import { FontAwesome } from "@expo/vector-icons"
 import { colors } from "app/utils/colors"
+import ChatTypingAnimate from "../ui/ChatTypingAnimate"
 
 export default function ChatRowItem(props) {
 
   const { myUserID } = useContext(StoreContext)
   const { members, lastMessage, lastMessageDate, lastSenderID,
-    notSeenBy, chatID } = props.chat
+    notSeenBy, chatID, userTyping } = props.chat
   const { sheetRef, setChatDetails } = props
   const otherUserID = members?.filter(userID => userID !== myUserID)[0]
   const otherUser = useUser(otherUserID)
   const otherUserHasSeen = !notSeenBy?.includes(otherUserID)
   const myUserHasSeen = !notSeenBy?.includes(myUserID)
   const navigation = useNavigation()
-  console.log(!notSeenBy?.includes(otherUserID))
 
   return (
     <Pressable
       key={chatID}
       style={styles.container}
       android_ripple={{ color: '#ddd' }}
-      onPress={() => navigation.navigate('Conversation', { chat: props.chat })}
+      onPress={() => navigation.navigate('Conversation', { chatID: chatID })}
       onLongPress={() => {
         Vibration.vibrate(1 * 5)
         setChatDetails(props.chat)
@@ -42,10 +42,16 @@ export default function ChatRowItem(props) {
         />
         <View style={styles.infoContainer}>
           <Text style={styles.userName}>{otherUser?.firstName} {otherUser?.lastName}</Text>
-          <Text style={[styles.messageText, !myUserHasSeen && lastSenderID !== myUserID && styles.unseenMessageText]}>
-            {lastSenderID === myUserID ? 'You: ' : ''}
-            {truncateText(lastMessage, 30)}
-          </Text>
+          {
+            userTyping?.includes(otherUserID) ? 
+            <ChatTypingAnimate 
+              style={styles.typingAnimate}
+            /> :
+            <Text style={[styles.messageText, !myUserHasSeen && lastSenderID !== myUserID && styles.unseenMessageText]}>
+              {lastSenderID === myUserID ? 'You: ' : ''}
+              {truncateText(lastMessage, 30)}
+            </Text>
+          }
           <Text style={styles.timestamp}>{getTimeTextAgo(lastMessageDate?.toDate())}</Text>
         </View>
       </View>
@@ -114,5 +120,10 @@ const styles = StyleSheet.create({
     height: 10,
     borderRadius: 10,
     backgroundColor: '#007aff',
+  },
+  typingAnimate: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 10
   }
 })

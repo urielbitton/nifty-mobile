@@ -9,7 +9,7 @@ export const useUser = (userID) => {
   useEffect(() => {
     if(userID)
       getUserByID(userID, setUser)
-  }, [])
+  },[userID])
 
   return user
 }

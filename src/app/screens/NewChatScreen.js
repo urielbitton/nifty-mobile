@@ -121,6 +121,8 @@ export default function NewChatScreen() {
                 uploadedImg={null}
                 setUploadedImg={null}
                 newChat
+                handleInputFocus={() => {}}
+                handleInputBlur={() => {}}
               />
             </View>
           </View>
