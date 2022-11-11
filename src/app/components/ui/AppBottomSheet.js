@@ -4,29 +4,28 @@ import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet'
 
 export default function AppBottomSheet(props) {
 
-  const { showSheet, sheetRef, children, snapPoints=['50%', '90%'] } = props
+  const { sheetRef, children, snapPoints=['50%','100%'] } = props
 
   return (
-    showSheet ?
     <BottomSheet
       ref={sheetRef}
       enableOverDrag
+      index={-1}
       handleIndicatorStyle={styles.handleIndicator}
       snapPoints={snapPoints}
       enablePanDownToClose
-      containerStyle={styles.container}
+      containerStyle={[styles.container]}
     >
       <BottomSheetScrollView>
         {children}
       </BottomSheetScrollView>
-    </BottomSheet> :
-    null
+    </BottomSheet>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    zIndex: 9999
+    zIndex: 9999,
   },
   handleIndicator: {
     backgroundColor: 'rgba(0, 0, 0, 0.3)',

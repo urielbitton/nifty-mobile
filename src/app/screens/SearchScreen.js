@@ -255,7 +255,7 @@ export default function SearchScreen() {
               containerStyle={styles.filterBtnContainer}
               titleStyle={styles.filterBtnText}
               buttonStyle={styles.filterBtn}
-              onPress={() => filtersSheetRef.current.expand()}
+              onPress={() => filtersSheetRef.current.snapToIndex(0)}
             />
             <Button
               title="Sort"
@@ -270,7 +270,7 @@ export default function SearchScreen() {
               containerStyle={styles.filterBtnContainer}
               buttonStyle={styles.filterBtn}
               titleStyle={styles.filterBtnText}
-              onPress={() => sortSheetRef.current.expand()}
+              onPress={() => sortSheetRef.current.snapToIndex(0)}
             />
           </View>
         </View>
@@ -397,6 +397,7 @@ export default function SearchScreen() {
       </AppBottomSheet>
       <AppBottomSheet
         sheetRef={sortSheetRef}
+        snapPoints={['50%', '100%']}
       >
         <View style={styles.filtersContainer}>
           <Text style={styles.filterTitle}>Sort Results</Text>
@@ -502,7 +503,6 @@ const styles = StyleSheet.create({
   filtersContainer: {
     padding: 20,
     paddingTop: 10,
-    height: '85%',
   },
   filterTitle: {
     fontSize: 19,
@@ -513,7 +513,6 @@ const styles = StyleSheet.create({
   filtersSection: {
     width: '100%',
     paddingBottom: 20,
-    marginBottom: 20,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(0,0,0,0.1)',
   },
@@ -580,9 +579,6 @@ const styles = StyleSheet.create({
   filtersActionsBar: {
     flexDirection: "row",
     justifyContent: "space-between",
-    position: "absolute",
-    bottom: 0,
-    left: 0,
     padding: 20,
     width: '100%',
   },

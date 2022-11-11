@@ -27,7 +27,6 @@ export default function ChatScreen() {
   const [messageText, setMessageText] = useState('')
   const [chatsLimit, setChatsLimit] = useState(10)
   const [chatDetails, setChatDetails] = useState(null)
-  const [showBottomSheet, setShowBottomSheet] = useState(false)
   const chats = useChats(myUserID, chatsLimit)
   const navigation = useNavigation()
   const sheetRef = useRef(null)

@@ -31,7 +31,7 @@ export default function ChatRowItem(props) {
       onLongPress={() => {
         Vibration.vibrate(1 * 5)
         setChatDetails(props.chat)
-        sheetRef.current?.expand()
+        sheetRef.current?.snapToIndex(0)
       }}
     >
       <View style={styles.left}>

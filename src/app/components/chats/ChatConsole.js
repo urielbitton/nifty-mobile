@@ -17,10 +17,10 @@ import { useState } from "react"
 export default function ChatConsole(props) {
 
   const { setPageLoading, myUser, myUserID } = useContext(StoreContext)
-  const { messageText, setMessageText, setUploadedImg, setPhotoLibrary,
+  const { messageText, setMessageText, setPhotoLibrary,
     chatPath, chatID, storagePath, scrollRef, chatMembers, searchNames,
-    newChat, handleInputFocus, handleInputBlur, photosSheetRef } = props
-  const [imageBlob, setImageBlob] = useState(null)
+    newChat, handleInputFocus, handleInputBlur, photosSheetRef,
+    uploadedImgs, setUploadedImgs } = props
   const [status, requestPermission] = MediaLibrary.usePermissions()
   const chat = useChat(chatID)
   const isNotEmptyMessage = /\S/.test(messageText)
@@ -39,7 +39,7 @@ export default function ChatConsole(props) {
       const insertTimestamp = isDateGreaterThanXTimeAgo(chat?.lastMessageDate?.toDate(), fifteenMinutes)
       return sendChatMessage(
         messageText, 
-        [imageBlob], 
+        uploadedImgs, 
         chatMembers,
         `chats/${chatID}/messages`, 
         chatPath, 
@@ -66,7 +66,7 @@ export default function ChatConsole(props) {
       if(chat) {
         handleSendMessage(chat.chatID)
         .then(() => {
-          navigation.navigate('Conversation', {chat})
+          navigation.navigate('Conversation', {chatID: chat.chatID})
         })
         .catch(err => console.log(err))
       }
@@ -75,7 +75,7 @@ export default function ChatConsole(props) {
         .then((chat) => {
           handleSendMessage(chat.chatID)
           .then(() => {
-            navigation.navigate('Conversation', {chat})
+            navigation.navigate('Conversation', {chatID: chat.chatID})
           })
           .catch(err => console.log(err))
         })
@@ -88,7 +88,7 @@ export default function ChatConsole(props) {
     requestPermission()
     .then(() => {
       if(status.granted) {
-        photosSheetRef?.current?.snapToPosition('50%')
+        photosSheetRef?.current?.snapToIndex(0)
         MediaLibrary.getAlbumAsync('Camera') 
         .then((album) => {
           if(album) {

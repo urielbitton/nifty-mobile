@@ -1,5 +1,4 @@
 import { db } from "app/firebase/firebase"
-import { compressImages } from "app/utils/fileUtils"
 import { extractAllLinksFromText } from "app/utils/generalUtils"
 import { getRandomDocID, setDB, updateDB } from "./crudDB"
 import { uploadMultipleFilesToFireStorage } from "./storageServices"
@@ -36,8 +35,8 @@ export const getMessagesByChatID = (chatID, setMessages, limit) => {
 
 export const getUnreadChatsByUserID = (userID, setUnreadChats) => {
   db.collection('chats')
-    // .where('members', 'array-contains', userID)
     .where('notSeenBy', 'array-contains', userID)
+    .orderBy('lastMessageDate', 'desc')
     .onSnapshot(snapshot => {
       setUnreadChats(snapshot.docs.map(doc => doc.data()))
     })
