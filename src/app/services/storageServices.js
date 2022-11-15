@@ -1,12 +1,14 @@
 import { storage } from "app/firebase/firebase"
+import { convertURItoBlob } from "app/utils/fileUtils"
 
 export const uploadMultipleFilesToFireStorage = (files, storagePath, setUploadProgress) => {
   return new Promise((resolve, reject) => {
     if(!files?.length || !files) return resolve([])
     const imgURLs = []
-    files.forEach((file, i) => {
+    files.forEach(async (file, i) => {
+      const blobFile = convertURItoBlob(file.uri)
       const storageRef = storage.ref(storagePath)
-      const uploadTask = storageRef.child('chat-imgs').put(file)
+      const uploadTask = storageRef.child(file.filename).put(await blobFile)
       uploadTask.on('state_changed', (snapshot) => {
         const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
         setUploadProgress && setUploadProgress(progress)

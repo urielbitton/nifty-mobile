@@ -15,6 +15,12 @@ export const uploadImageToBlob = async (uri) => {
   return blob
 }
 
+export const convertURItoBlob = async (uri) => {
+  const response = await fetch(uri)
+  const blob = await response.blob()
+  return blob
+}
+
 export const fileTypeConverter = (string) => {
   if(string?.includes('wordprocessingml')) 
     return {icon:'fas fa-file-word', color: '#2194ff', name: 'Word', docType: 'word'}

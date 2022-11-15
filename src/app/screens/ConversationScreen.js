@@ -14,7 +14,7 @@ import GoBackBtn from "app/components/ui/GoBackBtn"
 import IconContainer from "app/components/ui/IconContainer"
 import { useChat, useChatMessages } from "app/hooks/chatHooks"
 import { useUser } from "app/hooks/userHooks"
-import { updateIsTypingChat } from "app/services/chatsServices"
+import { sendChatMessage, updateIsTypingChat } from "app/services/chatsServices"
 import { firebaseArrayRemove, updateDB } from "app/services/crudDB"
 import { StoreContext } from "app/store/store"
 import { colors } from "app/utils/colors"
@@ -23,7 +23,7 @@ import { Button } from "@rneui/themed"
 
 export default function ConversationScreen(props) {
 
-  const { myUserID } = useContext(StoreContext)
+  const { myUser, myUserID } = useContext(StoreContext)
   const { chatID } = props.route.params
   const chat = useChat(chatID)
   const limitsNum = 15
@@ -38,6 +38,7 @@ export default function ConversationScreen(props) {
   const myUserHasSeen = !chat?.notSeenBy?.includes(myUserID)
   const scrollRef = useRef(null)
   const photosSheetRef = useRef(null)
+  const chatMembers = [myUserID, otherUserID]
 
   const messagesList = messages?.map((message, index) => {
     return <MessageItem
@@ -82,6 +83,21 @@ export default function ConversationScreen(props) {
   const handleInputBlur = () => {
     updateIsTypingChat(chatID, myUserID, false)
     setInputFocused(false)
+  }
+
+  const sendPhoto = () => {
+    sendChatMessage(
+      messageText,
+      uploadedImgs,
+      chatMembers,
+      `chats/${chatID}/messages`,
+      'chats',
+      chatID,
+      `chats/${chatID}/photos`,
+      myUser,
+      false,
+      true
+    )
   }
 
   useEffect(() => {
@@ -172,13 +188,12 @@ export default function ConversationScreen(props) {
               uploadedImgs.length > 0 &&
               <Button
                 title="Send"
-                onPress={() => { }}
+                onPress={() => sendPhoto()}
                 buttonStyle={styles.photoLibrarySendBtn}
               />
             }
           </View>
           <ScrollView contentContainerStyle={styles.photosLibraryGrid}>
-            {photoLibraryList}
             {photoLibraryList}
           </ScrollView>
         </View>

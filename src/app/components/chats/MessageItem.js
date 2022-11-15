@@ -6,6 +6,7 @@ import { getTimeTextAgo } from "app/utils/dateUtils"
 import React from 'react'
 import { useState } from "react"
 import { useContext } from "react"
+import { Image } from "react-native"
 import { View, StyleSheet, Text, Pressable } from "react-native"
 import AppAvatar from "../ui/AppAvatar"
 
@@ -13,62 +14,73 @@ export default function MessageItem(props) {
 
   const { myUserID } = useContext(StoreContext)
   const { hasLink, hasTimestamp, isCombined, isDeleted, isEdited,
-    messageDate, messageID, messageText, senderID, senderImg, 
-    senderName } = props.message
+    messageDate, messageID, messageText, senderID, senderImg,
+    chatImgs, hasImgs } = props.message
   const { chat } = props
-  const [showBottom, setShowBottom] = useState(false)
   const [showTimestamp, setShowTimestamp] = useState(false)
   const isMyMessage = senderID === myUserID
   const userSawCurrentMessage = !chat?.notSeenBy?.includes(senderID)
   const seenUser = useUser(chat?.members?.find(user => user !== senderID)?.userID)
   const isLastMessage = chat?.lastMessageID === messageID
 
+  const imgsRender = chatImgs?.map((img, index) => {
+    return <Image
+      source={{ uri: img?.imgURL }}
+      style={[styles.chatImg, isMyMessage && styles.myChatImg]}
+      key={index}
+    />
+  })
+
+  const timestampRow = (hasTimestamp || showTimestamp) &&
+    <View style={styles.top}>
+      <Text style={styles.timestamp}>{getTimeTextAgo(messageDate?.toDate())}</Text>
+    </View>
+
+  const displayAvatarOrCheckmark = !isMyMessage ?
+    <AppAvatar
+      dimensions={30}
+      source={senderImg}
+      style={styles.avatar}
+    /> :
+    !userSawCurrentMessage && isLastMessage ?
+      <AppAvatar
+        dimensions={13}
+        source={seenUser?.photoURL}
+      /> :
+      isLastMessage ?
+        <FontAwesome
+          name="check-circle"
+          size={14}
+          color={colors.primary}
+        /> :
+        <View style={styles.avatarSpacer} />
+
   return (
-    <Pressable 
-      style={[styles.container, !isCombined && styles.spaceTop]}
-      onPress={() => setShowTimestamp(prev => !prev)}
-      key={messageID}
-    >
-      {
-        (hasTimestamp || showTimestamp) &&
-        <View style={styles.top}>
-          <Text style={styles.timestamp}>{getTimeTextAgo(messageDate?.toDate())}</Text>
+    !hasImgs || chatImgs?.length < 1 ?
+      <Pressable
+        style={[styles.container, !isCombined && styles.spaceTop]}
+        onPress={() => setShowTimestamp(prev => !prev)}
+        key={messageID}
+      >
+        {timestampRow}
+        <View style={[styles.bubbleContainer, isMyMessage && styles.myBubbleContainer]}>
+          {displayAvatarOrCheckmark}
+          <View style={[styles.bubble, isMyMessage && styles.myBubble]}>
+            <Text style={[styles.messageText, isMyMessage && styles.myMessageText]}>
+              {messageText}
+            </Text>
+          </View>
         </View>
-      }
-      <View style={[styles.bubbleContainer, isMyMessage && styles.myBubbleContainer]}>
-        {
-          !isMyMessage ?
-          <AppAvatar
-            dimensions={30}
-            source={senderImg}
-            style={styles.avatar}
-          /> :
-          !userSawCurrentMessage && isLastMessage ?
-          <AppAvatar
-            dimensions={13}
-            source={seenUser?.photoURL}
-          /> :
-          isLastMessage ?
-          <FontAwesome
-            name="check-circle"
-            size={14}
-            color={colors.primary}
-          /> :
-          <View style={styles.avatarSpacer} />
-        }
-        <View style={[styles.bubble, isMyMessage && styles.myBubble]}>
-          <Text style={[styles.messageText, isMyMessage && styles.myMessageText]}>
-            {messageText}
-          </Text>
+      </Pressable> :
+      <View style={[styles.chatImgContainer, isMyMessage && styles.myChatImgContainer]}>
+        {timestampRow}
+        <View style={[styles.chatImgsRow, isMyMessage && styles.myChatImgsRow]}>
+          {displayAvatarOrCheckmark}
+          <View style={[styles.chatImgs, isMyMessage && styles.myChatImgs]}>
+            {imgsRender}
+          </View>
         </View>
       </View>
-      {
-        showBottom &&
-        <View style={styles.bottom}>
-
-        </View>
-      }
-    </Pressable>
   )
 }
 
@@ -89,7 +101,7 @@ const styles = StyleSheet.create({
   timestamp: {
     fontSize: 12,
     color: colors.darkGrayText,
-  },  
+  },
   bubbleContainer: {
     flexDirection: 'row',
     alignItems: 'flex-end',
@@ -123,12 +135,42 @@ const styles = StyleSheet.create({
   myBubble: {
     backgroundColor: colors.primary,
     marginRight: 5
-  }, 
+  },
   messageText: {
     fontSize: 16,
     color: '#333',
   },
   myMessageText: {
     color: '#fff',
-  }
+  },
+  chatImgContainer: {
+    marginTop: 10,
+    maxWidth: '100%',
+    alignItems: 'flex-start',
+  },
+  myChatImgContainer: {
+    alignItems: 'flex-end',
+  },
+  chatImgsRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    width: '90%',
+  },
+  myChatImgsRow: {
+    flexDirection: 'row-reverse',
+  },
+  chatImgs: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginLeft: 5,
+  },
+  myChatImgs: {
+    flexDirection: 'row-reverse',
+  },
+  chatImg: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+    margin: 2
+  },
 })

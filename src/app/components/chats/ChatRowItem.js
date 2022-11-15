@@ -14,7 +14,7 @@ export default function ChatRowItem(props) {
 
   const { myUserID } = useContext(StoreContext)
   const { members, lastMessage, lastMessageDate, lastSenderID,
-    notSeenBy, chatID, userTyping } = props.chat
+    notSeenBy, chatID, userTyping, lastMessageIsImg, lastMessageIsFile } = props.chat
   const { sheetRef, setChatDetails } = props
   const otherUserID = members?.filter(userID => userID !== myUserID)[0]
   const otherUser = useUser(otherUserID)
@@ -47,10 +47,12 @@ export default function ChatRowItem(props) {
             <ChatTypingAnimate 
               style={styles.typingAnimate}
             /> :
+            !lastMessageIsImg && !lastMessageIsFile ?
             <Text style={[styles.messageText, !myUserHasSeen && lastSenderID !== myUserID && styles.unseenMessageText]}>
               {lastSenderID === myUserID ? 'You: ' : ''}
               {truncateText(lastMessage, 30)}
-            </Text>
+            </Text> :
+            <Text>Shared a {lastMessageIsImg ? 'photo' : 'file'}</Text>
           }
           <Text style={styles.timestamp}>{getTimeTextAgo(lastMessageDate?.toDate())}</Text>
         </View>

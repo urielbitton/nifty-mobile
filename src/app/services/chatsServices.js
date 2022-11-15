@@ -75,7 +75,7 @@ export const getChatLinksByChatID = (path, setChatLinks, limit) => {
 export const sendChatMessage = (messageText, uploadedImgFiles, chatMembers, messagePath, chatPath,
   chatID, storagePath, myUser, isCombined, insertTimestamp) => {
   const messageLinks = extractAllLinksFromText(messageText)
-  return uploadMultipleFilesToFireStorage(uploadedImgFiles, storagePath)
+  return uploadMultipleFilesToFireStorage(uploadedImgFiles, storagePath, ()=>{})
     .then(imgURLs => {
       const docID = getRandomDocID(messagePath)
       return setDB(messagePath, docID, {
@@ -92,16 +92,16 @@ export const sendChatMessage = (messageText, uploadedImgFiles, chatMembers, mess
         hasLinks: messageLinks?.length > 0,
         ...(messageLinks?.length > 0 && { links: messageLinks }),
         ...(imgURLs.length && {
-          hasImgs: imgURLs.length,
-          hasFiles: imgURLs.length,
+          hasImgs: imgURLs.some(img => img.file.mediaType === 'photo'),
+          hasFiles: imgURLs.some(img => img.file.mediaType !== 'photo'),
           chatImgs: [
             ...imgURLs
               .map((imgURL, i) => {
                 return {
                   imgURL: imgURL.downloadURL,
-                  imgID: `${docID}_${i}`,
-                  name: '',
-                  type: ''
+                  imgID: imgURL.file.id,
+                  name: imgURL.file.filename,
+                  type: imgURL.file.mediaType,
                 }
               })
           ],
@@ -116,6 +116,8 @@ export const sendChatMessage = (messageText, uploadedImgFiles, chatMembers, mess
             lastMessageID: docID,
             lastSenderID: myUser?.userID,
             notSeenBy: chatMembers?.filter(member => member !== myUser?.userID),
+            lastMessageIsImg: imgURLs[imgURLs.length - 1]?.file.mediaType === 'photo',
+            lastMessageIsFile: imgURLs[imgURLs.length - 1]?.file.mediaType !== 'photo',
           })
         })
         .catch(err => console.log(err))
