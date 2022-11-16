@@ -180,6 +180,7 @@ export default function ConversationScreen(props) {
       <AppBottomSheet
         sheetRef={photosSheetRef}
         snapPoints={['50%', '100%']}
+        onClose={() => setUploadedImgs([])}
       >
         <View style={styles.photoLibraryContainer}>
           <View style={styles.photoLibraryTitles}>

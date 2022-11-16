@@ -6,13 +6,10 @@ import { createConversation, findExistingChat,
   sendChatMessage, updateIsTypingChat } from "app/services/chatsServices"
 import { StoreContext } from "app/store/store"
 import { colors } from "app/utils/colors"
-import * as ImagePicker from 'expo-image-picker'
 import * as MediaLibrary from 'expo-media-library'
 import { isDateGreaterThanXTimeAgo, isDateLessThanXTimeAgo } from "app/utils/dateUtils"
 import IconContainer from "../ui/IconContainer"
 import { useNavigation } from "@react-navigation/native"
-import { uploadImageToBlob } from "app/utils/fileUtils"
-import { useState } from "react"
 
 export default function ChatConsole(props) {
 
@@ -20,7 +17,7 @@ export default function ChatConsole(props) {
   const { messageText, setMessageText, setPhotoLibrary,
     chatPath, chatID, storagePath, scrollRef, chatMembers, searchNames,
     newChat, handleInputFocus, handleInputBlur, photosSheetRef,
-    uploadedImgs, setUploadedImgs } = props
+    uploadedImgs } = props
   const [status, requestPermission] = MediaLibrary.usePermissions()
   const chat = useChat(chatID)
   const isNotEmptyMessage = /\S/.test(messageText)
@@ -84,7 +81,7 @@ export default function ChatConsole(props) {
     })
   }
 
-  const pickImage = async () => {
+  const pickPhotos = async () => {
     requestPermission()
     .then(() => {
       if(status.granted) {
@@ -129,7 +126,7 @@ export default function ChatConsole(props) {
           iconName="photo" 
           style={styles.icon} 
           borderlessRipple
-          onPress={pickImage}
+          onPress={pickPhotos}
         />
       </View>
       <View style={styles.right}>
